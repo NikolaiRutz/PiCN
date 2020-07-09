@@ -25,18 +25,22 @@ nfn_fwd0.start_forwarder()
 nfn_fwd1.start_forwarder()
 simulation_bus.start_process()
 
-mgmt_client0.add_face("nfn1", None, 0)
-mgmt_client0.add_forwarding_rule(Name("/data"), [0])
 
-mgmt_client0.add_new_content(Name("/func/combine"), "PYTHON\nfunc\ndef func(a, b):\n    return a + b")
+mgmt_client0.add_face("nfn1", None, 0)
+#FW Rule = FIB?
+mgmt_client0.add_forwarding_rule(Name("/data"), [0])
+#wo genau kommt PIT in der Simulation zum einsatz?
+mgmt_client0.add_new_content(Name("/func/combine"), "Hello")
 mgmt_client1.add_new_content(Name("/data/obj1"), "World")
 
-name = Name("/func/combine")
-name += '_("Hello",/data/obj1)'
-name += "NFN"
+name1 = Name("/func/combine")
+name2 = Name("/data/obj1")
 
-res = fetch_tool.fetch_data(name, timeout=20)
-print(res)
+print(name1)
+
+res1 = fetch_tool.fetch_data(name1, timeout=20)
+res2 = fetch_tool.fetch_data(name2, timeout=20)
+print(res1 + res2)
 
 nfn_fwd0.stop_forwarder()
 nfn_fwd1.stop_forwarder()

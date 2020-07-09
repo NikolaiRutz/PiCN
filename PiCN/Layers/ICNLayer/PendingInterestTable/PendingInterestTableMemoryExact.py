@@ -14,8 +14,10 @@ class PendingInterstTableMemoryExact(BasePendingInterestTable):
     def __init__(self, pit_timeout: int=4, pit_retransmits:int=3) -> None:
         super().__init__(pit_timeout=pit_timeout, pit_retransmits=pit_retransmits)
 
+#TODO: change PIT
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app = False):
         for pit_entry in self.container:
+            print("here")
             if pit_entry.name == name:
                 if faceid in pit_entry.face_id and local_app in pit_entry.local_app:
                     return

@@ -67,6 +67,8 @@ class Fetch(object):
         # send packet
         self.lstack.start_all()
 
+
+    #TODO: change fetch_method
     def fetch_data(self, name: Name, timeout=4.0) -> str:
         """Fetch data from the server
         :param name Name to be fetched
