@@ -17,7 +17,6 @@ class PendingInterstTableMemoryExact(BasePendingInterestTable):
 #TODO: change PIT
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app = False):
         for pit_entry in self.container:
-            print("here")
             if pit_entry.name == name:
                 if faceid in pit_entry.face_id and local_app in pit_entry.local_app:
                     return
@@ -30,6 +29,7 @@ class PendingInterstTableMemoryExact(BasePendingInterestTable):
 
     def remove_pit_entry(self, name: Name):
         to_remove =[]
+
         for pit_entry in self.container:
             if(pit_entry.name == name):
                 to_remove.append(pit_entry)
@@ -75,6 +75,7 @@ class PendingInterstTableMemoryExact(BasePendingInterestTable):
         self.container.append(pit_entry)
 
     def get_already_used_pit_entries(self, name: Name):
+
         pit_entry = self.find_pit_entry(name)
         return pit_entry.fib_entries_already_used
 

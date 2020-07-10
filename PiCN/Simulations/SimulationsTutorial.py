@@ -19,7 +19,8 @@ nfn_fwd1 = NFNForwarder(port=0, encoder=NdnTlvEncoder(),
 mgmt_client0 = MgmtClient(nfn_fwd0.mgmt.mgmt_sock.getsockname()[1])
 mgmt_client1 = MgmtClient(nfn_fwd1.mgmt.mgmt_sock.getsockname()[1])
 
-fetch_tool = Fetch("nfn0", None, 255, NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("fetchtool1")])
+fetch_tool_0 = Fetch("nfn0", None, 255, NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("fetchtool0")])
+fetch_tool_1 = Fetch("nfn0", None, 255, NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("fetchtool1")])
 
 nfn_fwd0.start_forwarder()
 nfn_fwd1.start_forwarder()
@@ -33,18 +34,27 @@ mgmt_client0.add_forwarding_rule(Name("/data"), [0])
 mgmt_client0.add_new_content(Name("/func/combine"), "Hello")
 mgmt_client1.add_new_content(Name("/data/obj1"), "World")
 
+
 name1 = Name("/func/combine")
 name2 = Name("/data/obj1")
 
 print(name1)
 
-res1 = fetch_tool.fetch_data(name1, timeout=20)
-res2 = fetch_tool.fetch_data(name2, timeout=20)
-print(res1 + res2)
+res1 = fetch_tool_0.fetch_data(name1, timeout=20)
+res2 = fetch_tool_0.fetch_data(name2, timeout=20)
+
+print("Fetch_Tool_0: " + res1 + res2)
+
+res1 = fetch_tool_1.fetch_data(name2, timeout=20)
+res2 = fetch_tool_1.fetch_data(name2, timeout=20)
+
+print("Fetch_Tool_1: " + res1 + res2)
+
+
 
 nfn_fwd0.stop_forwarder()
 nfn_fwd1.stop_forwarder()
-fetch_tool.stop_fetch()
+fetch_tool_0.stop_fetch()
 simulation_bus.stop_process()
 mgmt_client0.shutdown()
 mgmt_client1.shutdown()

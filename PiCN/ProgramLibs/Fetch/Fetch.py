@@ -91,6 +91,10 @@ class Fetch(object):
             return "Received Nack: " + str(packet.reason.value)
         return None
 
+    def fetch_data_continuously(self, name: Name, timeout=4.0):
+        while 1:
+            self.fetch_data(name, timeout)
+
     def stop_fetch(self):
         """Close everything"""
         self.lstack.stop_all()
