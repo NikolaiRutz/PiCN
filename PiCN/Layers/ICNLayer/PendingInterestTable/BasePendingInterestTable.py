@@ -13,6 +13,7 @@ from PiCN.Layers.ICNLayer import BaseICNDataStruct
 class PendingInterestTableEntry(object):
     """An entry in the Forwarding Information Base"""
 
+#pub sub hinzufügen BOOL
     def __init__(self, name: Name, faceid: int, interest:Interest = None, local_app: bool=False,
                  fib_entries_already_used: List[ForwardingInformationBaseEntry]=None, faces_already_nacked=None,
                  number_of_forwards=0):

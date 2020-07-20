@@ -32,16 +32,18 @@ mgmt_client0.add_face("nfn1", None, 0)
 mgmt_client0.add_forwarding_rule(Name("/data"), [0])
 #wo genau kommt PIT in der Simulation zum einsatz?
 mgmt_client0.add_new_content(Name("/func/combine"), "Hello")
-mgmt_client1.add_new_content(Name("/data/obj1"), "World")
 
 
 name1 = Name("/func/combine")
 name2 = Name("/data/obj1")
 
-print(name1)
+fetch_tool_0.fetch_data("/subscribe(345435)")
 
 res1 = fetch_tool_0.fetch_data(name1, timeout=20)
 res2 = fetch_tool_0.fetch_data(name2, timeout=20)
+
+#erstes fetch_tool bekommt ein NACK. Sollte im PUB/SUB content bekommen sobald aktualisiert?
+mgmt_client1.add_new_content(Name("/data/obj1"), "World")
 
 print("Fetch_Tool_0: " + res1 + res2)
 
