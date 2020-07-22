@@ -23,10 +23,9 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
 
     # regex expression noch nicht ganz richtig (auch true wenn kein Wert in den Klammern steht)
     def is_pub_sub(self, name: Name) -> bool:
-        if re.search("/subscribe\(\d*\)", name.to_string()):
-            return True
+        sub_name = name.components[-1].decode("utf-8")
+        return bool(re.search("subscribe\(\d*\)", sub_name))
 
-    # TODO: wirft exception. fix this
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         for pit_entry in self.container:
             if pit_entry.name == name:
@@ -36,9 +35,10 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 pit_entry._faceids.append(faceid)
                 pit_entry._local_app.append(local_app)
                 self.container.append(pit_entry)
+                # falls pub-sub dann bool auf true; per default false
+                # vermutlich wird nicht richtiger PIT entry angepasst
+                pit_entry.pub_sub = self.is_pub_sub(name)
                 return
-            # falls pub-sub dann bool auf true; per default false
-            pit_entry.pub_sub = self.is_pub_sub(name)
         self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
 
     def extract_sub_value(self, name: Name):

@@ -29,16 +29,16 @@ simulation_bus.start_process()
 
 mgmt_client0.add_face("nfn1", None, 0)
 #FW Rule = FIB?
+
 mgmt_client0.add_forwarding_rule(Name("/data"), [0])
-mgmt_client0.add_forwarding_rule(Name("/subscribe(3)"), [0])
+
 #wo genau kommt PIT in der Simulation zum einsatz?
 mgmt_client0.add_new_content(Name("/func/combine"), "Hello")
 
 
 name1 = Name("/func/combine")
-name2 = Name("/data/obj1")
+name2 = Name("/data/obj1/subscribe(3)")
 
-fetch_tool_0.fetch_data("/subscribe(3)")
 
 res1 = fetch_tool_0.fetch_data(name1, timeout=20)
 res2 = fetch_tool_0.fetch_data(name2, timeout=20)
