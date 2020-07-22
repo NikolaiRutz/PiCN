@@ -26,6 +26,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         if re.search("/subscribe\(\d*\)", name.to_string()):
             return True
 
+    # TODO: wirft exception. fix this
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         for pit_entry in self.container:
             if pit_entry.name == name:
@@ -37,23 +38,37 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 self.container.append(pit_entry)
                 return
             # falls pub-sub dann bool auf true; per default false
-            self.pub_sub = self.is_pub_sub(name)
+            pit_entry.pub_sub = self.is_pub_sub(name)
         self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
+
+    def extract_sub_value(self, name: Name):
+        re.findall('\d+', name.components[0].decode("utf-8"))[0]
 
     def remove_pit_entry(self, name: Name):
         to_remove = []
         # checken ob es pub sub ist; über alles iterieren
         for pit_entry in self.container:
             if (pit_entry.name == name):
-                if not self.pub_sub:
+                if not pit_entry.pub_sub:
                     continue
                 to_remove.append(pit_entry)
         for r in to_remove:
             self.container.remove(r)
 
     # pub sub longest prefix bzw. subscribe(3)
-    #herausfiltern des Integers bei subscribe
+    # herausfiltern des Integers bei subscribe
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
+        for pit_entry in self.container:
+            if (pit_entry.name == name):
+                return pit_entry
+            # if PIT entry is PS. Do PS check
+            if pit_entry.pub_sub:
+                sub_entry_name = pit_entry.name
+                sub_entry_name.components.pop()
+                for i in range(self.extract_sub_value(pit_entry.name)):
+                    if (sub_entry_name == name):
+                        return pit_entry
+                    sub_entry_name.components.pop()
         return None
 
     # add pub sub
