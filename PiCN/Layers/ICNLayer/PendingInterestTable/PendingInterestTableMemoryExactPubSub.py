@@ -34,10 +34,10 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 self.container.remove(pit_entry)
                 pit_entry._faceids.append(faceid)
                 pit_entry._local_app.append(local_app)
-                self.container.append(pit_entry)
                 # falls pub-sub dann bool auf true; per default false
                 # vermutlich wird nicht richtiger PIT entry angepasst
                 pit_entry.pub_sub = self.is_pub_sub(name)
+                self.container.append(pit_entry)
                 return
         self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
 

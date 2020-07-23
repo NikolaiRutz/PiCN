@@ -6,11 +6,19 @@ from PiCN.Layers.PacketEncodingLayer.Encoder import BasicEncoder, SimpleStringEn
 from PiCN.Mgmt import MgmtClient
 from PiCN.Packets import Content, Interest, Name
 
-
+#ICN Forwarder verwenden
 simulation_bus = SimulationBus(packetencoder=NdnTlvEncoder())
 nfn_fwd0 = NFNForwarder(port=0, encoder=NdnTlvEncoder(),
                         interfaces=[simulation_bus.add_interface("nfn0")], log_level=255,
                         ageing_interval=1)
+
+#PIT PS in der Simualation überschreiben
+synced_data_struct_factory = PiCNSyncDataStructFactory()
+synced_data_struct_factory.register("pit", )
+synced_data_struct_factory.create_manager()
+nfn_fwd0.icnlayer.pit = synced_data_struct_factory.manager.pit()
+
+
 
 nfn_fwd1 = NFNForwarder(port=0, encoder=NdnTlvEncoder(),
                         interfaces=[simulation_bus.add_interface("nfn1")], log_level=255,
@@ -52,6 +60,11 @@ res1 = fetch_tool_1.fetch_data(name2, timeout=20)
 res2 = fetch_tool_1.fetch_data(name2, timeout=20)
 
 print("Fetch_Tool_1: " + res1 + res2)
+
+
+#create new Content/ put new content in queue
+content = Content(Name("/data/obj1"), "World")
+nfn_fwd0.icnlayer.queue_from_higher.put([0,content])
 
 
 
