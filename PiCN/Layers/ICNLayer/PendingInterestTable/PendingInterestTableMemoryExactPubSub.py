@@ -41,8 +41,8 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 return
         self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
 
-    def extract_sub_value(self, name: Name):
-        re.findall('\d+', name.components[0].decode("utf-8"))[0]
+    def extract_sub_value(self, name: Name) -> int:
+        return int(re.findall('\d+', name.components[-1].decode("utf-8"))[0])
 
     def remove_pit_entry(self, name: Name):
         to_remove = []
