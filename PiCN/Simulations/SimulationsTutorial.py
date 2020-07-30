@@ -16,10 +16,10 @@ nfn_fwd0 = NFNForwarder(port=0, encoder=NdnTlvEncoder(),
                         ageing_interval=1)
 
 # PIT PS in der Simualation überschreiben
-# synced_data_struct_factory = PiCNSyncDataStructFactory()
-# synced_data_struct_factory.register("pit", PendingInterestTableMemoryExactPubSub)
-# synced_data_struct_factory.create_manager()
-# nfn_fwd0.icnlayer.pit = synced_data_struct_factory.manager.pit()
+synced_data_struct_factory = PiCNSyncDataStructFactory()
+synced_data_struct_factory.register("pit", PendingInterestTableMemoryExactPubSub)
+synced_data_struct_factory.create_manager()
+nfn_fwd0.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
 
 nfn_fwd1 = NFNForwarder(port=0, encoder=NdnTlvEncoder(),
                         interfaces=[simulation_bus.add_interface("nfn1")], log_level=255,
@@ -47,17 +47,17 @@ name1 = Name("/func/combine")
 name2 = Name("/data/obj1/subscribe(3)")
 
 #res1 = fetch_tool_0.fetch_data(name1, timeout=20)
-res2 = fetch_tool_0.fetch_data(name2, timeout=20)
+#res2 = fetch_tool_0.fetch_data(name2, timeout=20)
 
 # erstes fetch_tool bekommt ein NACK. Sollte im PUB/SUB content bekommen sobald aktualisiert?
 mgmt_client1.add_new_content(Name("/data/obj1"), "World")
 
 #print("Fetch_Tool_0: " + res1 + res2)
 
-res1 = fetch_tool_1.fetch_data(name2, timeout=20)
+#res1 = fetch_tool_1.fetch_data(name2, timeout=20)
 res2 = fetch_tool_1.fetch_data(name2, timeout=20)
 
-print("Fetch_Tool_1: " + res1 + res2)
+print("Fetch_Tool_1: " + res2)
 
 # create new Content/ put new content in queue
 content = Content(Name("/data/obj1"), "World")

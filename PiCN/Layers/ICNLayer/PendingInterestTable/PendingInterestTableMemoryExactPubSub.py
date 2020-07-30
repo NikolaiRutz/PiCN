@@ -14,17 +14,14 @@ import re
 
 class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
 
-    def __init__(self, name: Name, faceid: int, interest: Interest = None, local_app: bool = False,
-                 fib_entries_already_used: List[ForwardingInformationBaseEntry] = None, faces_already_nacked=None,
-                 number_of_forwards=0, pub_sub: bool = False):
-        BasePendingInterestTable.__init__(name, faceid, interest, local_app, fib_entries_already_used,
-                                          faces_already_nacked, number_of_forwards)
+    def __init__(self, pit_timeout: int = 10, pit_retransmits: int = 3, pub_sub: bool = False):
+        BasePendingInterestTable.__init__(self, pit_timeout=pit_timeout, pit_retransmits=pit_retransmits)
         self.pub_sub = pub_sub
 
     # regex expression noch nicht ganz richtig (auch true wenn kein Wert in den Klammern steht)
     def is_pub_sub(self, name: Name) -> bool:
         sub_name = name.components[-1].decode("utf-8")
-        return bool(re.search("subscribe\(\d*\)", sub_name))
+        return bool(re.search("subscribe\(\d*\)", sub_name)),
 
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         for pit_entry in self.container:

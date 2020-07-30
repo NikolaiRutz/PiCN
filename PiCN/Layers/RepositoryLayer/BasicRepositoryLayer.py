@@ -19,6 +19,9 @@ class BasicRepositoryLayer(LayerProcess):
     def data_from_higher(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data: Packet):
         pass #do not expect this to happen, since repository is highest layer
 
+    #TODO: add content funktion (Liste mit subscirbern durchgehen und senden und ins repo legen)
+
+    #TODO: PS einfügen(content objekt mit approved bei ersten nachricht)
     def data_from_lower(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data: Packet):
         self.logger.info("Got Data from lower")
         if self._repository is None:
@@ -32,6 +35,7 @@ class BasicRepositoryLayer(LayerProcess):
                 self.logger.info("Found content object, sending down")
                 return
             elif self._proagate_interest is True:
+                #packete zurücksenden
                 self.queue_to_lower.put([faceid, packet])
                 return
             else:
