@@ -34,8 +34,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 self.container.remove(pit_entry)
                 pit_entry._faceids.append(faceid)
                 pit_entry._local_app.append(local_app)
-                # falls pub-sub dann bool auf true; per default false
-                # vermutlich wird nicht richtiger PIT entry angepasst
                 pit_entry.pub_sub = self.is_pub_sub(name)
                 self.container.append(pit_entry)
                 return
@@ -46,7 +44,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
 
     def remove_pit_entry(self, name: Name):
         to_remove = []
-        # checken ob es pub sub ist; über alles iterieren
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 if not pit_entry.pub_sub:
@@ -55,13 +52,10 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
-    # pub sub longest prefix bzw. subscribe(3)
-    # herausfiltern des Integers bei subscribe
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
-            # if PIT entry is PS. Do PS check
             if pit_entry.pub_sub:
                 sub_entry_name = pit_entry.name
                 sub_entry_name.components.pop()
