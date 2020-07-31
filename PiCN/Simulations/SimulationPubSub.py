@@ -10,7 +10,7 @@ from PiCN.Layers.ICNLayer.PendingInterestTable.PendingInterestTableMemoryExactPu
     PendingInterestTableMemoryExactPubSub
 from PiCN.ProgramLibs.ICNDataRepository import ICNDataRepository
 
-# TODO: ICN fw werden anscheinend nicht im BasicICNLayer aufgerufen
+
 simulation_bus = SimulationBus(packetencoder=NdnTlvEncoder())
 
 # ICN Forwarder 0
@@ -19,9 +19,10 @@ icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_
 # ICN Forwarder 1
 icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn1")],
                         log_level=255, ageing_interval=1)
+
 #TODO: repor erweitern für PS
-ICNrepo = ICNDataRepository(foldername=None, prefix=Name("/data"), port=0,
-                            interfaces=[simulation_bus.add_interface("repo0")])
+icn_repo = ICNDataRepository(foldername=None, prefix=Name("/data"), port=0,
+                             interfaces=[simulation_bus.add_interface("repo0")])
 # Manager to add Interfaces and FW-Rules
 mgmt_client0 = MgmtClient(icn_fwd0.mgmt.mgmt_sock.getsockname()[1])
 mgmt_client1 = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
@@ -50,7 +51,9 @@ print("Fetch_Tool_0: " + res2)
 # wo wird diese Methode aufgerufen
 content = Content(Name("/data/obj1"), "World")
 icn_fwd0.icnlayer.queue_from_higher.put([0, content])
-ICNrepo.repolayer.repo.add_content(Name("/data2"), "content")
+
+#TODO funktioniert noch nicht richtig
+icn_repo.repolayer.repo.add_content(Name("/data2"), "content")
 
 icn_fwd0.stop_forwarder()
 icn_fwd0.stop_forwarder()

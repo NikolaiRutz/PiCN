@@ -7,7 +7,6 @@ from PiCN.Layers.ICNLayer.PendingInterestTable.BasePendingInterestTable import B
     PendingInterestTableEntry
 from PiCN.Layers.ICNLayer.ForwardingInformationBase import ForwardingInformationBaseEntry
 from PiCN.Packets import Interest, Name
-import re
 
 class PendingInterstTableMemoryExact(BasePendingInterestTable):
     """in-memory Pending Interest Table using exact prefix matching"""
@@ -25,7 +24,6 @@ class PendingInterstTableMemoryExact(BasePendingInterestTable):
                 pit_entry._local_app.append(local_app)
                 self.container.append(pit_entry)
                 return
-            # falls pub-sub dann bool auf true; per default false
             print(pit_entry)
         self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
 

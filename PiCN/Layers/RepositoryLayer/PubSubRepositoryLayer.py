@@ -1,25 +1,20 @@
-"""Basic implementation of the repository layer"""
-
 import multiprocessing
 
 from PiCN.Layers.RepositoryLayer.Repository import BaseRepository
+from PiCN.Layers.RepositoryLayer import BasicRepositoryLayer
 from PiCN.Packets import Interest, Content, Packet, Nack, NackReason
 from PiCN.Processes import LayerProcess
+from PiCN.Packets import Content, Interest, Name
+
+class PubSubRepositoryLayer(BasicRepositoryLayer):
 
 
-class BasicRepositoryLayer(LayerProcess):
-    """Basic implementation of the repository layer"""
+    # TODO: add content funktion (Liste mit subscirbern durchgehen und senden und ins repo legen)
+    def add_content(self, name: Name, data):
+        return
 
-    def __init__(self, repository: BaseRepository, propagate_interest: bool = False, logger_name="RepoLayer",
-                 log_level=255):
-        super().__init__(logger_name, log_level)
 
-        self._repository: BaseRepository = repository
-        self._proagate_interest: bool = propagate_interest
-
-    def data_from_higher(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data: Packet):
-        pass  # do not expect this to happen, since repository is highest layer
-
+    # TODO: PS einfügen(content objekt mit approved bei ersten nachricht)
     def data_from_lower(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data: Packet):
         self.logger.info("Got Data from lower")
         if self._repository is None:
@@ -33,6 +28,7 @@ class BasicRepositoryLayer(LayerProcess):
                 self.logger.info("Found content object, sending down")
                 return
             elif self._proagate_interest is True:
+                # packete zurücksenden
                 self.queue_to_lower.put([faceid, packet])
                 return
             else:
@@ -41,4 +37,4 @@ class BasicRepositoryLayer(LayerProcess):
                 to_lower.put([faceid, nack])
                 return
         if isinstance(packet, Content):
-            pass
+             pass
