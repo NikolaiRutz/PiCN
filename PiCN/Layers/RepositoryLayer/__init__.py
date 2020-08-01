@@ -5,3 +5,4 @@
 
 from .BasicRepositoryLayer import BasicRepositoryLayer
 from .PushRepositoryLayer import PushRepositoryLayer
+from .PubSubRepositoryLayer import PubSubRepositoryLayer

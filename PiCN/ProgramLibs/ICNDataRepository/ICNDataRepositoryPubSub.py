@@ -28,7 +28,6 @@ from PiCN.ProgramLibs.ICNDataRepository import ICNDataRepository
 from PiCN.Layers.RepositoryLayer import PubSubRepositoryLayer
 
 
-#TODO: fix error with callable
 class ICNDataRepositoryPubSub(ICNDataRepository):
 
     def __init__(self, foldername: Optional[str], prefix: Name,
