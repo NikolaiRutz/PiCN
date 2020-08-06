@@ -21,7 +21,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
     # regex expression noch nicht ganz richtig (auch true wenn kein Wert in den Klammern steht)
     def is_pub_sub(self, name: Name) -> bool:
         sub_name = name.components[-1].decode("utf-8")
-        return bool(re.search("subscribe\(\d*\)", sub_name)),
+        return bool(re.search("subscribe\(\d*\)", sub_name))
 
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         for pit_entry in self.container:

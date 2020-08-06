@@ -18,13 +18,16 @@ icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_
 # ICN Forwarder 1
 icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn1")],
                         log_level=255, ageing_interval=1)
-
+# ICN Forwarder 2
+icn_fwd2 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn2")],
+                        log_level=255, ageing_interval=1)
 
 icn_repo = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data"), port=0,
                              interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder())
 # Manager to add Interfaces and FW-Rules
 mgmt_client0 = MgmtClient(icn_fwd0.mgmt.mgmt_sock.getsockname()[1])
 mgmt_client1 = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
+mgmt_client2 = MgmtClient(icn_fwd2.mgmt.mgmt_sock.getsockname()[1])
 mgmt_repo = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
 
 # Clients to fetch Data from Forwarder
@@ -33,19 +36,23 @@ fetch_tool_1 = Fetch("icn1", None, 255, NdnTlvEncoder(), interfaces=[simulation_
 
 icn_fwd0.start_forwarder()
 icn_fwd1.start_forwarder()
+icn_fwd2.start_forwarder()
 icn_repo.start_repo()
 simulation_bus.start_process()
 
 # interfaces the content is forwarded to
 mgmt_client0.add_face("icn1", None, 0)
+mgmt_client0.add_face("icn2", None, 0)
 mgmt_client1.add_face("repo0", None, 0)
+mgmt_client2.add_face("repo0", None, 0)
 
 # FW-Rules
 mgmt_client0.add_forwarding_rule(Name("/data"), [0])
 mgmt_client1.add_forwarding_rule(Name("/data"), [0])
+mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 
 
-name0 = Name("/data/obj1")
+name0 = Name("/data/obj1/subscribe(1)")
 res0 = fetch_tool_0.fetch_data(name0, timeout=20)
 
 #print("Fetch_Tool_0: " + res0)
