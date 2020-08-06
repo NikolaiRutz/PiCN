@@ -12,7 +12,6 @@ class BasicRepositoryLayer(LayerProcess):
 
     def __init__(self, repository: BaseRepository, propagate_interest: bool=False, logger_name="RepoLayer", log_level=255):
         super().__init__(logger_name, log_level)
-
         self._repository: BaseRepository = repository
         self._proagate_interest: bool = propagate_interest
 

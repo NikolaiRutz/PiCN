@@ -19,9 +19,9 @@ icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_
 icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn1")],
                         log_level=255, ageing_interval=1)
 
-# TODO: repor erweitern für PS
-icn_repo = ICNDataRepository(foldername=None, prefix=Name("/data"), port=0,
-                             interfaces=[simulation_bus.add_interface("repo0")])
+
+icn_repo = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data"), port=0,
+                             interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder())
 # Manager to add Interfaces and FW-Rules
 mgmt_client0 = MgmtClient(icn_fwd0.mgmt.mgmt_sock.getsockname()[1])
 mgmt_client1 = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
@@ -48,7 +48,7 @@ mgmt_client1.add_forwarding_rule(Name("/data"), [0])
 name0 = Name("/data/obj1")
 res0 = fetch_tool_0.fetch_data(name0, timeout=20)
 
-print("Fetch_Tool_0: " + res0)
+#print("Fetch_Tool_0: " + res0)
 
 # create new Content/ put new content in queue
 #content = Content(Name("/data/obj1"), "World")
