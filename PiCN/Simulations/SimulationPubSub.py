@@ -47,7 +47,7 @@ mgmt_client1.add_face("repo0", None, 0)
 mgmt_client2.add_face("repo0", None, 0)
 
 # FW-Rules
-mgmt_client0.add_forwarding_rule(Name("/data"), [0])
+mgmt_client0.add_forwarding_rule(Name("/data"), [0, 1])
 mgmt_client1.add_forwarding_rule(Name("/data"), [0])
 mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 

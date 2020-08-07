@@ -36,5 +36,6 @@ class ICNDataRepositoryPubSub(ICNDataRepository):
                  use_thunks=False):
         ICNDataRepository.__init__(self, foldername=foldername, prefix=prefix, port=port, log_level=log_level, encoder=encoder,
               autoconfig=autoconfig, autoconfig_routed=autoconfig_routed, interfaces=interfaces,
-              use_thunks=use_thunks)
-        self.repolayer = PubSubRepositoryLayer(self.repo, log_level=log_level)
+              use_thunks=use_thunks, repolayer=PubSubRepositoryLayer(log_level=log_level))
+        self.repolayer._repository = self.repo
+

@@ -35,7 +35,7 @@ class ICNDataRepository(object):
     def __init__(self, foldername: Optional[str], prefix: Name,
                  port=9000, log_level=255, encoder: BasicEncoder = None,
                  autoconfig: bool = False, autoconfig_routed: bool = False, interfaces: List[BaseInterface]=None,
-                 use_thunks=False):
+                 use_thunks=False, repolayer = None):
         """
         :param foldername: If None, use an in-memory repository. Else, use a file system repository.
         """
@@ -83,7 +83,11 @@ class ICNDataRepository(object):
         self.linklayer = BasicLinkLayer(interfaces, faceidtable, log_level=log_level)
         self.packetencodinglayer = BasicPacketEncodingLayer(self.encoder, log_level=log_level)
         self.chunklayer = BasicChunkLayer(self.chunkifyer, log_level=log_level)
-        self.repolayer = BasicRepositoryLayer(self.repo, log_level=log_level)
+        if repolayer is None:
+            print(repolayer)
+            self.repolayer = BasicRepositoryLayer(self.repo, log_level=log_level)
+        else:
+            self.repolayer = repolayer
 
         if use_thunks:
             self.thunklayer = BasicThunkLayer(None, None, None, faceidtable, thunktable, plantable, self.parser, self.repo, log_level=log_level)
