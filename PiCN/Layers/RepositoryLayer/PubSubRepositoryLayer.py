@@ -22,6 +22,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
 
     # TODO: add content funktion (Liste mit subscirbern durchgehen und senden und ins repo legen) soll SimpleRepo aufrufen
     def add_content(self, name: Name, data):
+        self._repository.add_content(name, data)
         return
 
     # TODO: clean this code. This two methods are also in PITMemoryExactPS

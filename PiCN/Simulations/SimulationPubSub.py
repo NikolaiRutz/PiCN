@@ -52,6 +52,9 @@ mgmt_client1.add_forwarding_rule(Name("/data"), [0])
 mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 
 
+icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
+
+#TODO: why mutiple interest packages goin to the repo?
 name0 = Name("/data/obj1/subscribe(1)")
 res0 = fetch_tool_0.fetch_data(name0, timeout=20)
 
