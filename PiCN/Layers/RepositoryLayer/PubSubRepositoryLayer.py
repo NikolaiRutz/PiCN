@@ -29,10 +29,13 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
     def check_subscription(self, name: Name, data):
         print(self._subscribtion_list.keys())
         for sub_element in self._subscribtion_list:
-            print(sub_element.keys())
+            for sub_index in range (sub_element[1]):
+                if name.components[-1 - sub_index] == sub_element[0]:
+                    self.propagate_content(self._subscribtion_list[sub_element], data)
 
-    def propagate_content(self, name: Name, data):
-        return
+    def propagate_content(self, face_id: list, data):
+        for i in face_id:
+            self.queue_to_lower.put([i, data])
 
     #TODO: clean this code. This two methods are also in PITMemoryExactPS
     def is_pub_sub(self, name: Name) -> bool:
