@@ -9,6 +9,7 @@ from PiCN.Packets import Content, Interest, Name
 from PiCN.Layers.ICNLayer.PendingInterestTable.PendingInterestTableMemoryExactPubSub import \
     PendingInterestTableMemoryExactPubSub
 from PiCN.ProgramLibs.ICNDataRepository import ICNDataRepository, ICNDataRepositoryPubSub
+import time
 
 simulation_bus = SimulationBus(packetencoder=NdnTlvEncoder())
 
@@ -52,11 +53,17 @@ mgmt_client1.add_forwarding_rule(Name("/data"), [0])
 mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 
 
-icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
 
 #TODO: why mutiple interest packages goin to the repo?
 name0 = Name("/data/obj1/subscribe(1)")
+#name1 = Name("/data/obj2/subscribe(1)")
+#name2 = Name("/data/obj3/subscribe(1)")
 res0 = fetch_tool_0.fetch_data(name0, timeout=20)
+#res0 = fetch_tool_0.fetch_data(name1, timeout=20)
+#res0 = fetch_tool_0.fetch_data(name2, timeout=20)
+
+#TODO: Fuunktion ist nicht synchron mit INterest Packages --> subscription list wird später angepasst
+icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
 
 #print("Fetch_Tool_0: " + res0)
 

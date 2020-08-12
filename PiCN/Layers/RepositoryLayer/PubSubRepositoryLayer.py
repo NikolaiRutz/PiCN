@@ -23,9 +23,18 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
     # TODO: add content funktion (Liste mit subscirbern durchgehen und senden und ins repo legen) soll SimpleRepo aufrufen
     def add_content(self, name: Name, data):
         self._repository.add_content(name, data)
+        self.check_subscription(name,data)
         return
 
-    # TODO: clean this code. This two methods are also in PITMemoryExactPS
+    def check_subscription(self, name: Name, data):
+        print(self._subscribtion_list.keys())
+        for sub_element in self._subscribtion_list:
+            print(sub_element.keys())
+
+    def propagate_content(self, name: Name, data):
+        return
+
+    #TODO: clean this code. This two methods are also in PITMemoryExactPS
     def is_pub_sub(self, name: Name) -> bool:
         sub_name = name.components[-1].decode("utf-8")
         return bool(re.search("subscribe\(\d*\)", sub_name))
@@ -54,10 +63,11 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
             elif self.is_pub_sub(packet.name):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
+
                 path_name = packet.name.components[-1 - sub_length]
                 if faceid not in self._subscribtion_list[(path_name, sub_length)]:
                     self._subscribtion_list[(path_name, sub_length)].append(faceid)
-                    #TODO: content richtig erstellen
+                    #TODO: content richtig erstellen/ack für sub
                     content = self._repository.get_content(packet.name)
                     self.queue_to_lower.put([0, content])
                 else:
