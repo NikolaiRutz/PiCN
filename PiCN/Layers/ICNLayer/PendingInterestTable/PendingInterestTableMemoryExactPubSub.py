@@ -34,7 +34,9 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 pit_entry.pub_sub = self.is_pub_sub(name)
                 self.container.append(pit_entry)
                 return
-        self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
+        # check if fisrt entry in container is a PS entry
+        self.container.append(
+            PendingInterestTableEntry(name, faceid, interest, local_app, pub_sub=True))
 
     def extract_sub_value(self, name: Name) -> int:
         return int(re.findall('\d+', name.components[-1].decode("utf-8"))[0])
@@ -49,10 +51,12 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
+    #TODO: container mit PIT entries bleibt immer leer
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
+            print("here")
             if pit_entry.pub_sub:
                 sub_entry_name = pit_entry.name
                 sub_entry_name.components.pop()

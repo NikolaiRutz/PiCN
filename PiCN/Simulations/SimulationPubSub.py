@@ -13,6 +13,11 @@ import time
 
 simulation_bus = SimulationBus(packetencoder=NdnTlvEncoder())
 
+# Pub-Sub Pit
+synced_data_struct_factory = PiCNSyncDataStructFactory()
+synced_data_struct_factory.register("pit", PendingInterestTableMemoryExactPubSub)
+synced_data_struct_factory.create_manager()
+
 # ICN Forwarder 0
 icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn0")],
                         log_level=255, ageing_interval=1)
@@ -23,8 +28,12 @@ icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_
 icn_fwd2 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn2")],
                         log_level=255, ageing_interval=1)
 
+icn_fwd0.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
+icn_fwd1.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
+icn_fwd2.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
+
 icn_repo = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data"), port=0,
-                             interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder())
+                                   interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder())
 # Manager to add Interfaces and FW-Rules
 mgmt_client0 = MgmtClient(icn_fwd0.mgmt.mgmt_sock.getsockname()[1])
 mgmt_client1 = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
@@ -52,28 +61,26 @@ mgmt_client0.add_forwarding_rule(Name("/data"), [0, 1])
 mgmt_client1.add_forwarding_rule(Name("/data"), [0])
 mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 
-
-
-#TODO: why mutiple interest packages goin to the repo?
+# TODO: why mutiple interest packages goin to the repo?
 name0 = Name("/data/obj1/subscribe(1)")
-#name1 = Name("/data/obj2/subscribe(1)")
-#name2 = Name("/data/obj3/subscribe(1)")
+name1 = Name("/data/obj1/subscribe(1)")
+# name2 = Name("/data/obj3/subscribe(1)")
 res0 = fetch_tool_0.fetch_data(name0, timeout=20)
-#res0 = fetch_tool_0.fetch_data(name1, timeout=20)
-#res0 = fetch_tool_0.fetch_data(name2, timeout=20)
+res0 = fetch_tool_0.fetch_data(name1, timeout=20)
+# res0 = fetch_tool_0.fetch_data(name2, timeout=20)
 
-#TODO: Fuunktion ist nicht synchron mit INterest Packages --> subscription list wird später angepasst
+# TODO: Fuunktion ist nicht synchron mit INterest Packages --> subscription list wird später angepasst
 icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
 
-#print("Fetch_Tool_0: " + res0)
+# print("Fetch_Tool_0: " + res0)
 
 # create new Content/ put new content in queue
-#content = Content(Name("/data/obj1"), "World")
-#icn_fwd0.icnlayer.queue_from_higher.put([0, content])
+# content = Content(Name("/data/obj1"), "World")
+# icn_fwd0.icnlayer.queue_from_higher.put([0, content])
 
-#TODO: add Funktion richtig implementireren
-#Content dem Repo hinzufügen
-#icn_repo.repolayer.repo.add_content(Name("/data/obj1"), "content")
+# TODO: add Funktion richtig implementireren
+# Content dem Repo hinzufügen
+# icn_repo.repolayer.repo.add_content(Name("/data/obj1"), "content")
 
 icn_fwd0.stop_forwarder()
 icn_fwd0.stop_forwarder()
