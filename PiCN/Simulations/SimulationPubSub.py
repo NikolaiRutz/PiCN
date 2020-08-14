@@ -9,7 +9,6 @@ from PiCN.Packets import Content, Interest, Name
 from PiCN.Layers.ICNLayer.PendingInterestTable.PendingInterestTableMemoryExactPubSub import \
     PendingInterestTableMemoryExactPubSub
 from PiCN.ProgramLibs.ICNDataRepository import ICNDataRepository, ICNDataRepositoryPubSub
-import time
 
 simulation_bus = SimulationBus(packetencoder=NdnTlvEncoder())
 

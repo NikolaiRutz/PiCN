@@ -18,6 +18,7 @@ class SimpleMemoryRepository(BaseRepository):
         self.logger = logger
         self._storage: Dict[Name, object] = manager.dict()
         self._prefix: manager.Value = manager.Value(Name, prefix)
+        self._subscribtion_list = manager.dict()
 
     def is_content_available(self, icnname: Name) -> bool:
         if icnname is None or not self._prefix.value.is_prefix_of(icnname):

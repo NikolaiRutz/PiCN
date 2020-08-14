@@ -51,12 +51,11 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
-    #TODO: container mit PIT entries bleibt immer leer
+    #TODO: container pub_sub stimmt nicht mit pub_sub von pit_entry überein
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
-            print("here")
             if pit_entry.pub_sub:
                 sub_entry_name = pit_entry.name
                 sub_entry_name.components.pop()
