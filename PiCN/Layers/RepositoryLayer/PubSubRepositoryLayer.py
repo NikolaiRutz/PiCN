@@ -28,6 +28,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 if name.components[-1 - sub_index] == sub_element[0]:
                     self.propagate_content(self._repository._subscribtion_list[sub_element], data)
 
+    # TODO: queue to lower wird nicht richtig ausgeführt
     def propagate_content(self, face_id: list, data):
         for i in face_id:
             self.queue_to_lower.put([i, data])
@@ -62,11 +63,11 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 sub_length = self.extract_sub_value(packet.name)
                 path_name = packet.name.components[-1 - sub_length]
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
-                    # TODO: subscribtion list wird nicht richtig befüllt
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:
-                    self._repository._subscribtion_list[(path_name, sub_length)].append(faceid)
-
+                    faceid_to_update = list(self._repository._subscribtion_list[(path_name, sub_length)])
+                    faceid_to_update.append(faceid)
+                    self._repository._subscribtion_list[(path_name, sub_length)] = faceid_to_update
                     # TODO: content richtig erstellen/ack für sub
                     content = self._repository.get_content(packet.name)
                     self.queue_to_lower.put([0, content])

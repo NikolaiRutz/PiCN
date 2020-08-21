@@ -20,6 +20,7 @@ from PiCN.Layers.ICNLayer.ContentStore import ContentStoreMemoryExact
 from PiCN.Layers.LinkLayer import BasicLinkLayer
 from PiCN.Layers.LinkLayer.Interfaces import UDP4Interface, AddressInfo, BaseInterface
 from PiCN.Layers.LinkLayer.FaceIDTable import FaceIDDict
+from PiCN.Layers.RepositoryLayer.PubSubRepositoryLayer import PubSubRepositoryLayer
 
 from PiCN.Layers.PacketEncodingLayer.Encoder import BasicEncoder, SimpleStringEncoder
 from PiCN.Logger import Logger
@@ -42,18 +43,22 @@ class ICNForwarder(object):
             encoder.set_log_level(log_level=log_level)
             self.encoder = encoder
 
+        #TODO: set up synchronization for SubList
+
         # setup data structures
         synced_data_struct_factory = PiCNSyncDataStructFactory()
         synced_data_struct_factory.register("cs", ContentStoreMemoryExact)
         synced_data_struct_factory.register("fib", ForwardingInformationBaseMemoryPrefix)
         synced_data_struct_factory.register("pit", PendingInterstTableMemoryExact)
         synced_data_struct_factory.register("rib", TreeRoutingInformationBase)
+        #synced_data_struct_factory.register("subscribtion_list", PubSubRepositoryLayer)
         synced_data_struct_factory.register("faceidtable", FaceIDDict)
         synced_data_struct_factory.create_manager()
 
         cs = synced_data_struct_factory.manager.cs()
         fib = synced_data_struct_factory.manager.fib()
         pit = synced_data_struct_factory.manager.pit()
+        #subscribtion_list = synced_data_struct_factory.manager.subscribtionList()
         if routing:
             rib = synced_data_struct_factory.manager.rib()
         faceidtable = synced_data_struct_factory.manager.faceidtable()
