@@ -32,6 +32,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
     def propagate_content(self, face_id: list, data):
         for i in face_id:
             self.queue_to_lower.put([i, data])
+            self.logger.info("Updating Subscriber about added content")
 
     # TODO: clean this code. This two methods are also in PITMemoryExactPS
     def is_pub_sub(self, name: Name) -> bool:
@@ -62,6 +63,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
                 path_name = packet.name.components[-1 - sub_length]
+                self.queue_to_lower.put([faceid, "hello"])
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:
@@ -72,7 +74,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                     content = self._repository.get_content(packet.name)
                     self.queue_to_lower.put([0, content])
                 else:
-                    # TODO: add handler for already subscribed faces
+                    # TODO: add handler for already subscribed faceIDs(doesn' work anyway blyat)
                     print("already subscribed")
 
             else:

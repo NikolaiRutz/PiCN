@@ -61,23 +61,24 @@ mgmt_client1.add_forwarding_rule(Name("/data"), [0])
 mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 
 # TODO: why mutiple interest packages goin to the repo?
-name0 = Name("/data/obj1/subscribe(1)")
-name1 = Name("/data/obj1/subscribe(1)")
+name0 = Name("/data/obj1/subscribe(2)")
+name1 = Name("/data/obj1/subscribe(2)")
 # name2 = Name("/data/obj3/subscribe(1)")
 res0 = fetch_tool_0.fetch_data(name0, timeout=20)
 res0 = fetch_tool_0.fetch_data(name1, timeout=20)
 # res0 = fetch_tool_0.fetch_data(name2, timeout=20)
 
-# TODO: Fuunktion ist nicht synchron mit INterest Packages --> subscription list wird später angepasst
+
 icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
 
+# TODO: content wird vom repo nach dem adden geschickt. Wie soll er beim Client ausgegeben werden?
+print(res0)
 # print("Fetch_Tool_0: " + res0)
 
 # create new Content/ put new content in queue
 # content = Content(Name("/data/obj1"), "World")
 # icn_fwd0.icnlayer.queue_from_higher.put([0, content])
 
-# TODO: add Funktion richtig implementireren
 # Content dem Repo hinzufügen
 # icn_repo.repolayer.repo.add_content(Name("/data/obj1"), "content")
 

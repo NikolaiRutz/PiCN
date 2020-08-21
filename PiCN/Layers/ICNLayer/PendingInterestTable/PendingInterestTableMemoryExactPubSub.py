@@ -23,6 +23,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         sub_name = name.components[-1].decode("utf-8")
         return bool(re.search("subscribe\(\d*\)", sub_name))
 
+    #TODO: PIT entry wird nicht richtig ertstellt wenn subscribe value zu hoch ist!
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         for pit_entry in self.container:
             if pit_entry.name == name:
