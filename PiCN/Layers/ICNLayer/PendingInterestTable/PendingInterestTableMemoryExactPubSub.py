@@ -52,7 +52,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
-    #TODO: container pub_sub stimmt nicht mit pub_sub von pit_entry überein
+    #TODO: container pub_sub stimmt nicht mit pub_sub von pit_entry überein/ subscribe string soll rausgenommen werden
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
@@ -66,6 +66,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                     sub_entry_name.components.pop()
         return None
 
-    # add pub sub
+    #TODO: add PS ageing
     def ageing(self) -> List[PendingInterestTableEntry]:
         return None

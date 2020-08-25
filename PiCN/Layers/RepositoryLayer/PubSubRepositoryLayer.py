@@ -17,7 +17,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                                       logger_name=logger_name,
                                       log_level=log_level)
 
-    def add_content(self, name: Name, data):
+    def add_content(self, name: Name, data: Content):
         self._repository.add_content(name, data)
         self.check_subscription(name, data)
         return
@@ -26,13 +26,13 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         for sub_element in self._repository._subscribtion_list:
             for sub_index in range(sub_element[1]):
                 if name.components[-1 - sub_index] == sub_element[0]:
-                    self.propagate_content(self._repository._subscribtion_list[sub_element], data)
+                    self.propagate_content(self._repository._subscribtion_list[sub_element], Content(name, data))
 
-    # TODO: queue to lower wird nicht richtig ausgeführt
+    # TODO: queue to lower wird nicht richtig ausgeführt / aus data content machen
     def propagate_content(self, face_id: list, data):
         for i in face_id:
             self.queue_to_lower.put([i, data])
-            self.logger.info("Updating Subscriber about added content")
+            self.logger.info("Updating Subscriber about added content" + str(i) + ".." )
 
     # TODO: clean this code. This two methods are also in PITMemoryExactPS
     def is_pub_sub(self, name: Name) -> bool:

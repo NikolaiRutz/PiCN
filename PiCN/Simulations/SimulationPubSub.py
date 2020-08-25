@@ -19,7 +19,7 @@ synced_data_struct_factory.create_manager()
 
 # ICN Forwarder 0
 icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn0")],
-                        log_level=255, ageing_interval=1)
+                        log_level=0, ageing_interval=1)
 # ICN Forwarder 1
 icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn1")],
                         log_level=255, ageing_interval=1)

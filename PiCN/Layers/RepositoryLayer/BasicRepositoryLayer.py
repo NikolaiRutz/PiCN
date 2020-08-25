@@ -20,7 +20,6 @@ class BasicRepositoryLayer(LayerProcess):
         pass #do not expect this to happen, since repository is highest layer
 
     def data_from_lower(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data: Packet):
-        print("here")
         self.logger.info("Got Data from lower")
         if self._repository is None:
             return
