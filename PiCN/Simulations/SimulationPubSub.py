@@ -9,6 +9,7 @@ from PiCN.Packets import Content, Interest, Name
 from PiCN.Layers.ICNLayer.PendingInterestTable.PendingInterestTableMemoryExactPubSub import \
     PendingInterestTableMemoryExactPubSub
 from PiCN.ProgramLibs.ICNDataRepository import ICNDataRepository, ICNDataRepositoryPubSub
+import time
 
 simulation_bus = SimulationBus(packetencoder=NdnTlvEncoder())
 
@@ -19,7 +20,7 @@ synced_data_struct_factory.create_manager()
 
 # ICN Forwarder 0
 icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn0")],
-                        log_level=0, ageing_interval=1)
+                        log_level=255, ageing_interval=1)
 # ICN Forwarder 1
 icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn1")],
                         log_level=255, ageing_interval=1)
@@ -64,14 +65,15 @@ mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 name0 = Name("/data/obj1/subscribe(2)")
 name1 = Name("/data/obj1/subscribe(2)")
 # name2 = Name("/data/obj3/subscribe(1)")
-res0 = fetch_tool_0.fetch_data(name0, timeout=20)
+#res0 = fetch_tool_0.fetch_data(name0, timeout=20)
 res0 = fetch_tool_0.fetch_data(name1, timeout=20)
 # res0 = fetch_tool_0.fetch_data(name2, timeout=20)
 
 
 icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
 
-# TODO: content wird vom repo nach dem adden geschickt. Wie soll er beim Client ausgegeben werden?
+# TODO: content kommt zu spät an deswegen wird ein NACK ausgegeben
+time.sleep(3)
 print(res0)
 # print("Fetch_Tool_0: " + res0)
 

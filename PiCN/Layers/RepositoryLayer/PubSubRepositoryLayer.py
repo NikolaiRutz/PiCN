@@ -32,7 +32,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
     def propagate_content(self, face_id: list, data):
         for i in face_id:
             self.queue_to_lower.put([i, data])
-            self.logger.info("Updating Subscriber about added content" + str(i) + ".." )
+            self.logger.info("Updating Subscriber about added content. FaceID: " + str(i))
 
     # TODO: clean this code. This two methods are also in PITMemoryExactPS
     def is_pub_sub(self, name: Name) -> bool:
