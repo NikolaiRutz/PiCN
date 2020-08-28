@@ -23,6 +23,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         return
 
     def check_subscription(self, name: Name, data):
+        print(self._repository._subscribtion_list.keys())
         for sub_element in self._repository._subscribtion_list:
             for sub_index in range(sub_element[1]):
                 if name.components[-1 - sub_index] == sub_element[0]:
@@ -63,7 +64,6 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
                 path_name = packet.name.components[-1 - sub_length]
-                self.queue_to_lower.put([faceid, "hello"])
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:
@@ -72,10 +72,11 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                     self._repository._subscribtion_list[(path_name, sub_length)] = faceid_to_update
                     # TODO: content richtig erstellen/ack für sub
                     content = self._repository.get_content(packet.name)
+                    if content == None:
+                        return
                     self.queue_to_lower.put([0, content])
                 else:
-                    # TODO: add handler for already subscribed faceIDs(doesn' work anyway blyat)
-                    print("already subscribed")
+                    self.logger.info("already subscribed. Face ID: " + str(faceid))
 
             else:
                 self.logger.info("No matching data, dropping interest, sending nack")

@@ -43,6 +43,7 @@ class BasicChunkLayer(LayerProcess):
         self.logger.info("Got Data from higher")
         faceid = data[0]
         packet = data[1]
+        print(str(packet) + "  " + str(faceid))
         if isinstance(packet, Interest):
             self.logger.info("Packet is Interest " + str(packet.name))
             requestentry = self.get_request_table_entry(packet.name)
@@ -88,6 +89,7 @@ class BasicChunkLayer(LayerProcess):
             self.logger.info("Packet is Content")
             request_table_entry = self.get_request_table_entry(packet.name)
             if request_table_entry is None:
+                to_higher.put([faceid, packet])
                 return
             self._request_table.remove(request_table_entry)
             if request_table_entry.chunked is False: #not chunked content

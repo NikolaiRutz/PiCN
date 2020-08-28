@@ -33,7 +33,7 @@ icn_fwd1.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
 icn_fwd2.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
 
 icn_repo = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data"), port=0,
-                                   interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder())
+                                   interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(), log_level=0)
 # Manager to add Interfaces and FW-Rules
 mgmt_client0 = MgmtClient(icn_fwd0.mgmt.mgmt_sock.getsockname()[1])
 mgmt_client1 = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
@@ -65,14 +65,21 @@ mgmt_client2.add_forwarding_rule(Name("/data"), [0])
 name0 = Name("/data/obj1/subscribe(2)")
 name1 = Name("/data/obj1/subscribe(2)")
 # name2 = Name("/data/obj3/subscribe(1)")
-#res0 = fetch_tool_0.fetch_data(name0, timeout=20)
-res0 = fetch_tool_0.fetch_data(name1, timeout=20)
+try:
+    res0 = fetch_tool_0.fetch_data(name0, timeout=1)
+except:
+    pass
+time.sleep(2)
+icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
+time.sleep(1)
+res0 = fetch_tool_0.fetch_data(name0, timeout=0)
 # res0 = fetch_tool_0.fetch_data(name2, timeout=20)
 
 
-icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
+
 
 # TODO: content kommt zu spät an deswegen wird ein NACK ausgegeben
+print(res0)
 time.sleep(3)
 print(res0)
 # print("Fetch_Tool_0: " + res0)
