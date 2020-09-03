@@ -11,11 +11,13 @@ from PiCN.Layers.PacketEncodingLayer.Encoder import SimpleStringEncoder
 from PiCN.Layers.PacketEncodingLayer.Encoder import BasicEncoder
 from PiCN.Packets import Content, Name, Interest, Nack
 from PiCN.Layers.TimeoutPreventionLayer import BasicTimeoutPreventionLayer, TimeoutPreventionMessageDict
+from multiprocessing import Process
+
 
 class Fetch(object):
     """Fetch Tool for PiCN"""
 
-    def __init__(self, ip: str, port: int, log_level=255, encoder: BasicEncoder=None, autoconfig: bool = False,
+    def __init__(self, ip: str, port: int, log_level=255, encoder: BasicEncoder = None, autoconfig: bool = False,
                  interfaces=None):
 
         # create encoder and chunkifyer
@@ -52,7 +54,10 @@ class Fetch(object):
 
         self.lstack.start_all()
 
-    #TODO: muss in einem seperatem Prozess laufen
+    def fetch_data_process(self, name: Name, timeout=4.0):
+        p = Process(target=self.fetch_data, args=(name,))
+        p.start()
+
     def fetch_data(self, name: Name, timeout=4.0) -> str:
         """Fetch data from the server
         :param name Name to be fetched
@@ -60,15 +65,15 @@ class Fetch(object):
         """
         interest: Interest = Interest(name)
         self.lstack.queue_from_higher.put([self.fid, interest])
-
-        if timeout == 0:
+        #TODO: sperate this into a function
+        while True:
             packet = self.lstack.queue_to_higher.get()[1]
-        else:
-            packet = self.lstack.queue_to_higher.get(timeout=timeout)[1]
-        if isinstance(packet, Content):
-            return packet.content
-        if isinstance(packet, Nack):
-            return "Received Nack: " + str(packet.reason.value)
+            if isinstance(packet, Content):
+                print("name: " + str(packet.name) + " | return content: " + str(packet.content))
+                # return packet.content
+            if isinstance(packet, Nack):
+                print("return Nack")
+                # return "Received Nack: " + str(packet.reason.value)
         return None
 
     def stop_fetch(self):
