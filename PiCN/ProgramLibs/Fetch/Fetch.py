@@ -68,6 +68,7 @@ class Fetch(object):
         #TODO: sperate this into a function
         while True:
             packet = self.lstack.queue_to_higher.get()[1]
+            print("here")
             if isinstance(packet, Content):
                 print("name: " + str(packet.name) + " | return content: " + str(packet.content))
                 # return packet.content

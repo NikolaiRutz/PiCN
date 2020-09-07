@@ -36,7 +36,7 @@ if __name__ == "__main__":
     icn_fwd2.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
 
     icn_repo = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data"), port=0,
-                                       interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(), log_level=0)
+                                       interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(), log_level=255)
     # Manager to add Interfaces and FW-Rules
     mgmt_client0 = MgmtClient(icn_fwd0.mgmt.mgmt_sock.getsockname()[1])
     mgmt_client1 = MgmtClient(icn_fwd1.mgmt.mgmt_sock.getsockname()[1])
