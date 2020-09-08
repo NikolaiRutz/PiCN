@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     # ICN Forwarder 0
     icn_fwd0 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn0")],
-                            log_level=255, ageing_interval=1)
+                            log_level=0, ageing_interval=1)
     # ICN Forwarder 1
     icn_fwd1 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn1")],
                             log_level=255, ageing_interval=1)
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         pass
 
 
-    res0 = fetch_tool_0.fetch_data_process(name0, timeout=0)
+    fetch_tool_0.fetch_data_process(name0, timeout=0)
     time.sleep(3)
     icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
     # res0 = fetch_tool_0.fetch_data(name2, timeout=20)
@@ -89,9 +89,9 @@ if __name__ == "__main__":
     # Content dem Repo hinzufügen
     # icn_repo.repolayer.repo.add_content(Name("/data/obj1"), "content")
 
-    icn_fwd0.stop_forwarder()
-    icn_fwd0.stop_forwarder()
-    fetch_tool_0.stop_fetch()
-    simulation_bus.stop_process()
-    mgmt_client0.shutdown()
-    mgmt_client1.shutdown()
+    # icn_fwd0.stop_forwarder()
+    # icn_fwd0.stop_forwarder()
+    # fetch_tool_0.stop_fetch()
+    # simulation_bus.stop_process()
+    # mgmt_client0.shutdown()
+    # mgmt_client1.shutdown()

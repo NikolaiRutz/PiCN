@@ -61,14 +61,14 @@ if __name__ == "__main__":
 
     # PS Repos
     icn_repo0 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data0"), port=0,
-                                         interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(),
-                                         log_level=255)
+                                        interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(),
+                                        log_level=255)
     icn_repo1 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data1"), port=0,
-                                         interfaces=[simulation_bus.add_interface("repo1")], encoder=NdnTlvEncoder(),
-                                         log_level=255)
+                                        interfaces=[simulation_bus.add_interface("repo1")], encoder=NdnTlvEncoder(),
+                                        log_level=255)
     icn_repo2 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data2"), port=0,
-                                         interfaces=[simulation_bus.add_interface("repo2")], encoder=NdnTlvEncoder(),
-                                         log_level=255)
+                                        interfaces=[simulation_bus.add_interface("repo2")], encoder=NdnTlvEncoder(),
+                                        log_level=255)
     # Fetchtools
     fetch_tool_0 = Fetch("icn0", None, 255, NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("fetchtool0")])
     fetch_tool_1 = Fetch("icn0", None, 255, NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("fetchtool1")])
@@ -137,9 +137,7 @@ if __name__ == "__main__":
     mgmt_client6.add_forwarding_rule(Name("/data3"), [0, 1])
     mgmt_client7.add_forwarding_rule(Name("/data3"), [0])
 
-    #TODO: add content requests
-
-
+    # TODO: add content requests
 
     # TODO: why mutiple interest packages goin to the repo?
     name0 = Name("/data/obj1/subscribe(2)")
@@ -153,7 +151,7 @@ if __name__ == "__main__":
 
     res0 = fetch_tool_0.fetch_data_process(name0, timeout=0)
     time.sleep(3)
-    icn_repo.repolayer.add_content(Name("/data/obj1"), "content")
+    icn_repo0.repolayer.add_content(Name("/data/obj1"), "content")
     # res0 = fetch_tool_0.fetch_data(name2, timeout=20)
 
     # print("Fetch_Tool_0: " + res0)
@@ -165,9 +163,4 @@ if __name__ == "__main__":
     # Content dem Repo hinzufügen
     # icn_repo.repolayer.repo.add_content(Name("/data/obj1"), "content")
 
-    icn_fwd0.stop_forwarder()
-    icn_fwd0.stop_forwarder()
-    fetch_tool_0.stop_fetch()
-    simulation_bus.stop_process()
-    mgmt_client0.shutdown()
-    mgmt_client1.shutdown()
+
