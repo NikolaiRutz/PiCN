@@ -23,7 +23,6 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         return
 
     def check_subscription(self, name: Name, data):
-        print(self._repository._subscribtion_list.keys())
         for sub_element in self._repository._subscribtion_list:
             for sub_index in range(sub_element[1]):
                 if name.components[-1 - sub_index] == sub_element[0]:

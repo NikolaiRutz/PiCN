@@ -8,6 +8,7 @@ from PiCN.Layers.ICNLayer.PendingInterestTable.BasePendingInterestTable import B
 from PiCN.Layers.ICNLayer.ForwardingInformationBase import ForwardingInformationBaseEntry
 from PiCN.Packets import Interest, Name
 import re
+import copy
 
 """PIT for Pub/Sub Model"""
 
@@ -18,6 +19,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         BasePendingInterestTable.__init__(self, pit_timeout=pit_timeout, pit_retransmits=pit_retransmits)
         self.pub_sub = pub_sub
 
+    #TODO: clean this code
     # regex expression noch nicht ganz richtig (auch true wenn kein Wert in den Klammern steht)
     def is_pub_sub(self, name: Name) -> bool:
         sub_name = name.components[-1].decode("utf-8")
@@ -32,7 +34,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 self.container.remove(pit_entry)
                 pit_entry._faceids.append(faceid)
                 pit_entry._local_app.append(local_app)
-                # TODO: subscribe text wird entfernt, zurückgeliefert wird pathlength
                 if self.extract_sub_value(name) >= 0:
                     pit_entry.pub_sub = self.extract_sub_value(name)
                     name.components.pop()
@@ -59,23 +60,22 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
-    # TODO: container pub_sub stimmt nicht mit pub_sub von pit_entry überein/ subscribe string soll rausgenommen werden
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
-            # TODO: wirf exception; weiss nicht genau wo
+            #TODO: pop funktioniert nicht wegen subscirbe value (deepcopy problem)
             if pit_entry.pub_sub >= 0:
-                sub_entry_name = name
+                sub_entry_name = copy.deepcopy(name)
                 if self.extract_sub_value(name) >= 0:
                     sub_entry_name.components.pop()
                 for i in range(pit_entry.pub_sub):
+                    print(str(sub_entry_name))
                     if (sub_entry_name == pit_entry.name):
                         return pit_entry
                     sub_entry_name.components.pop()
         return None
 
-    # TODO: add PS ageing/möglicherweise funktioniert es deshalb nicht richtig
     def ageing(self) -> List[PendingInterestTableEntry]:
         cur_time = time.time()
         remove = []

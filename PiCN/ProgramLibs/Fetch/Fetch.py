@@ -54,23 +54,22 @@ class Fetch(object):
 
         self.lstack.start_all()
 
-    def fetch_data_process(self, name: Name, timeout=4.0):
+    def listen_for_content(self, name: Name):
         p = Process(target=self.fetch_data, args=(name,))
         p.start()
 
-    def fetch_data(self, name: Name, timeout=4.0) -> str:
+    def fetch_data(self, name: Name) -> str:
         """Fetch data from the server
         :param name Name to be fetched
         :param timeout Timeout to wait for a response. Use 0 for infinity
         """
+        #PIT muss befüllt werden; erst Interest schicken
         interest: Interest = Interest(name)
         self.lstack.queue_from_higher.put([self.fid, interest])
-        #TODO: sperate this into a function
         while True:
             packet = self.lstack.queue_to_higher.get()[1]
-            print("here")
             if isinstance(packet, Content):
-                print("name: " + str(packet.name) + " | return content: " + str(packet.content))
+                print("name: " + str(packet.name) + " | returned content: " + str(packet.content))
                 # return packet.content
             if isinstance(packet, Nack):
                 print("return Nack")

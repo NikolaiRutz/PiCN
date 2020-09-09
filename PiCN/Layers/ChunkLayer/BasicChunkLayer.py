@@ -43,7 +43,6 @@ class BasicChunkLayer(LayerProcess):
         self.logger.info("Got Data from higher")
         faceid = data[0]
         packet = data[1]
-        print(str(packet) + "  " + str(faceid))
         if isinstance(packet, Interest):
             self.logger.info("Packet is Interest " + str(packet.name))
             requestentry = self.get_request_table_entry(packet.name)

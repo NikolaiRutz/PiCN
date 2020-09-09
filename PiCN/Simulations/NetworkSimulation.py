@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # PS Repos
     icn_repo0 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data0"), port=0,
                                         interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(),
-                                        log_level=255)
+                                        log_level=0)
     icn_repo1 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data1"), port=0,
                                         interfaces=[simulation_bus.add_interface("repo1")], encoder=NdnTlvEncoder(),
                                         log_level=255)
@@ -138,29 +138,13 @@ if __name__ == "__main__":
     mgmt_client7.add_forwarding_rule(Name("/data3"), [0])
 
     # TODO: add content requests
-
-    # TODO: why mutiple interest packages goin to the repo?
-    name0 = Name("/data/obj1/subscribe(2)")
-    name1 = Name("/data/obj1/subscribe(2)")
-    # name2 = Name("/data/obj3/subscribe(1)")
-    try:
-        # res0 = fetch_tool_0.fetch_data(name0, timeout=1)
-        print("fetchtool try catch")
-    except:
-        pass
-
-    res0 = fetch_tool_0.fetch_data_process(name0, timeout=0)
+    # Test1: data0 content subscribtion
+    name0 = Name("/data0/obj0/test0/subscribe(2)")
+    fetch_tool_0.listen_for_content(name0)
+    #TODO: wenn es keinen sleep gibt, wirft es eine exception
     time.sleep(3)
-    icn_repo0.repolayer.add_content(Name("/data/obj1"), "content")
-    # res0 = fetch_tool_0.fetch_data(name2, timeout=20)
+    icn_repo0.repolayer.add_content(Name("/data0/obj0"), "testobj0")
 
-    # print("Fetch_Tool_0: " + res0)
 
-    # create new Content/ put new content in queue
-    # content = Content(Name("/data/obj1"), "World")
-    # icn_fwd0.icnlayer.queue_from_higher.put([0, content])
-
-    # Content dem Repo hinzufügen
-    # icn_repo.repolayer.repo.add_content(Name("/data/obj1"), "content")
 
 
