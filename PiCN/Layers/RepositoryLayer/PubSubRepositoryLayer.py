@@ -24,9 +24,9 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
 
     def check_subscription(self, name: Name, data):
         for sub_element in self._repository._subscribtion_list:
-            for sub_index in range(sub_element[1]):
-                print("name: " + str(name))
-                print("sub_element: " + str(sub_element))
+            for sub_index in range(sub_element[1] + 1):
+                print("name: " + str(name.components[-1 - sub_index]))
+                print("sub_element: " + str(sub_element[0]))
                 if name.components[-1 - sub_index] == sub_element[0]:
                     self.propagate_content(self._repository._subscribtion_list[sub_element], Content(name, data))
 
@@ -64,7 +64,8 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
             elif self.is_pub_sub(packet.name):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
-                path_name = packet.name.components[-1 - sub_length]
+                path_name = packet.name.components[-2]
+                print(str(path_name))
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:

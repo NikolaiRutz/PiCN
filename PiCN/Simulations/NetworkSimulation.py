@@ -143,7 +143,7 @@ if __name__ == "__main__":
     fetch_tool_0.listen_for_content(name0)
     #TODO: wenn es keinen sleep gibt, wirft es eine exception
     time.sleep(3)
-    icn_repo0.repolayer.add_content(Name("/data0/obj0/test0/shizzle"), "testobj0")
+    icn_repo0.repolayer.add_content(Name("/data0/obj0/test0/shizzle/dizzle"), "testobj0")
 
 
 
