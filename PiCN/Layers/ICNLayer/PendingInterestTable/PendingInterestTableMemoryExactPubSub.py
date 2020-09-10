@@ -64,13 +64,19 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
-            #TODO: pop funktioniert nicht wegen subscirbe value (deepcopy problem)
-            if pit_entry.pub_sub >= 0:
+            if (self.is_pub_sub(name)):
                 sub_entry_name = copy.deepcopy(name)
-                if self.extract_sub_value(name) >= 0:
-                    sub_entry_name.components.pop()
+                sub_entry_name.components.pop()
+                #TODO: schauen ob auch der sub value gleich sein muss
+                if(sub_entry_name == pit_entry.name):
+                    return pit_entry
+            #2 cases. einmal interest mit sub hinten dran -> soll auch pitentry returnen
+            #und einmal content der zum client zurückfinden soll
+            if pit_entry.pub_sub >= 0:
+                sub_entry_name = copy.deepcopy(pit_entry.name)
+                if len(sub_entry_name) < len(pit_entry.name):
+                    return None
                 for i in range(pit_entry.pub_sub):
-                    print(str(sub_entry_name))
                     if (sub_entry_name == pit_entry.name):
                         return pit_entry
                     sub_entry_name.components.pop()

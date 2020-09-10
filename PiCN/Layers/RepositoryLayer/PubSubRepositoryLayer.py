@@ -25,6 +25,8 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
     def check_subscription(self, name: Name, data):
         for sub_element in self._repository._subscribtion_list:
             for sub_index in range(sub_element[1]):
+                print("name: " + str(name))
+                print("sub_element: " + str(sub_element))
                 if name.components[-1 - sub_index] == sub_element[0]:
                     self.propagate_content(self._repository._subscribtion_list[sub_element], Content(name, data))
 
