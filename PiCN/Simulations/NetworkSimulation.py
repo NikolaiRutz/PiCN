@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # PS Repos
     icn_repo0 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data0"), port=0,
                                         interfaces=[simulation_bus.add_interface("repo0")], encoder=NdnTlvEncoder(),
-                                        log_level=0)
+                                        log_level=255)
     icn_repo1 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data1"), port=0,
                                         interfaces=[simulation_bus.add_interface("repo1")], encoder=NdnTlvEncoder(),
                                         log_level=255)
@@ -127,6 +127,7 @@ if __name__ == "__main__":
     mgmt_client4.add_forwarding_rule(Name("/data1"), [0])
     mgmt_client5.add_forwarding_rule(Name("/data1"), [0])
 
+    mgmt_client0.add_forwarding_rule(Name("/data2"), [1])
     mgmt_client1.add_forwarding_rule(Name("/data2"), [0])
     mgmt_client6.add_forwarding_rule(Name("/data2"), [0, 1])
     mgmt_client4.add_forwarding_rule(Name("/data2"), [0])
@@ -136,15 +137,43 @@ if __name__ == "__main__":
     mgmt_client1.add_forwarding_rule(Name("/data3"), [0, 1])
     mgmt_client6.add_forwarding_rule(Name("/data3"), [0, 1])
     mgmt_client7.add_forwarding_rule(Name("/data3"), [0])
+    mgmt_client8.add_forwarding_rule(Name("/data3"), [0])
 
-    # TODO: add content requests
-    # Test1: data0 content subscribtion
-    name0 = Name("/data0/obj0/test0/subscribe(2)")
+    # Test1: fetchtool0 content subscription
+    name0 = Name("/data0/subscribe(10)")
     fetch_tool_0.listen_for_content(name0)
-    #TODO: wenn es keinen sleep gibt, wirft es eine exception
-    time.sleep(3)
-    icn_repo0.repolayer.add_content(Name("/data0/obj0/test0/shizzle/dizzle"), "testobj0")
 
+    name1 = Name("/data2/test2/subscribe(0)")
+    fetch_tool_0.listen_for_content(name1)
+
+    # Test2: fetchtool1 content subscription
+    name2 = Name("/data1/test1/content1/subscribe(3)")
+    fetch_tool_1.listen_for_content(name2)
+
+    name3 = Name("/data0/test0/subscribe(2)")
+    fetch_tool_1.listen_for_content(name3)
+
+    name4 = Name("/data2/test2/content2/stuff2/subscribe(0)")
+    fetch_tool_1.listen_for_content(name4)
+
+    # Test3: fetchtool2 content subscription
+    name5 = Name("/data3/test3/subscribe(0)")
+    fetch_tool_2.listen_for_content(name5)
+
+    name6 = Name("/data3/test3/content3/stuff3/path3/subscribe(2)")
+    fetch_tool_2.listen_for_content(name6)
+
+    # Test4: fetchtool4 content subscription
+    name7 = Name("/data3/subscribe(10)")
+    fetch_tool_3.listen_for_content(name7)
+
+
+    # TODO: wenn es keinen sleep gibt, wirft es eine exception
+    time.sleep(3)
+    icn_repo0.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
+    icn_repo1.repolayer.add_content(Name("/data1/test1/content1/stuff0/djasndasd/sadasdas"), "testobj1")
+    icn_repo2.repolayer.add_content(Name("/data3/test3/content3/stuff3/path3/asfasfasf/asfasfas"), "testobj3")
+    time.sleep(10)
 
 
 

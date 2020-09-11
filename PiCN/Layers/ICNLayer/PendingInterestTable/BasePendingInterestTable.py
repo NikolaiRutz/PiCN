@@ -163,6 +163,8 @@ class BasePendingInterestTable(BaseICNDataStruct):
 
     def increase_number_of_forwards(self, name):
         pit_entry = self.find_pit_entry(name)
+        if pit_entry == None:
+            return
         self.remove_pit_entry(name)
         pit_entry.number_of_forwards = pit_entry.number_of_forwards + 1
         self.append(pit_entry)
@@ -181,6 +183,8 @@ class BasePendingInterestTable(BaseICNDataStruct):
 
     def test_faceid_was_nacked(self, name, fid: int):
         pit_entry = self.find_pit_entry(name)
+        if pit_entry == None:
+            return False
         return (fid in pit_entry.faces_already_nacked)
 
     def set_pit_timeout(self, timeout: float):

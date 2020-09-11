@@ -24,7 +24,6 @@ class PendingInterstTableMemoryExact(BasePendingInterestTable):
                 pit_entry._local_app.append(local_app)
                 self.container.append(pit_entry)
                 return
-            print(pit_entry)
         self.container.append(PendingInterestTableEntry(name, faceid, interest, local_app))
 
     def remove_pit_entry(self, name: Name):

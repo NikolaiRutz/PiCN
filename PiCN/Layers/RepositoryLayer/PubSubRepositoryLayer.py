@@ -25,12 +25,9 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
     def check_subscription(self, name: Name, data):
         for sub_element in self._repository._subscribtion_list:
             for sub_index in range(sub_element[1] + 1):
-                print("name: " + str(name.components[-1 - sub_index]))
-                print("sub_element: " + str(sub_element[0]))
-                if name.components[-1 - sub_index] == sub_element[0]:
+                if len(name) > sub_index and name.components[-1 - sub_index] == sub_element[0]:
                     self.propagate_content(self._repository._subscribtion_list[sub_element], Content(name, data))
 
-    # TODO: queue to lower wird nicht richtig ausgeführt / aus data content machen
     def propagate_content(self, face_id: list, data):
         for i in face_id:
             self.queue_to_lower.put([i, data])
@@ -65,7 +62,6 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
                 path_name = packet.name.components[-2]
-                print(str(path_name))
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:

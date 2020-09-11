@@ -25,7 +25,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         sub_name = name.components[-1].decode("utf-8")
         return bool(re.search("subscribe\(\d*\)", sub_name))
 
-    # TODO: PIT entry wird nicht richtig ertstellt wenn subscribe value zu hoch ist!
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         for pit_entry in self.container:
             if pit_entry.name == name:
@@ -65,18 +64,17 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
             if (pit_entry.name == name):
                 return pit_entry
             if (self.is_pub_sub(name)):
-                sub_entry_name = copy.deepcopy(name)
-                sub_entry_name.components.pop()
+                sub_entry_name = Name(pit_entry.name.components[:-1])
                 #TODO: schauen ob auch der sub value gleich sein muss
                 if(sub_entry_name == pit_entry.name):
                     return pit_entry
             #2 cases. einmal interest mit sub hinten dran -> soll auch pitentry returnen
             #und einmal content der zum client zurückfinden soll
             if pit_entry.pub_sub >= 0:
-                sub_entry_name = copy.deepcopy(pit_entry.name)
+                sub_entry_name = Name(name.components[:])
                 if len(sub_entry_name) < len(pit_entry.name):
                     return None
-                for i in range(pit_entry.pub_sub):
+                for i in range(min(pit_entry.pub_sub + 1, len(name.components))):
                     if (sub_entry_name == pit_entry.name):
                         return pit_entry
                     sub_entry_name.components.pop()
@@ -95,8 +93,12 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 pit_entry.retransmits = pit_entry.retransmits + 1
                 updated.append(pit_entry)
         for pit_entry in remove:
+            if pit_entry.pub_sub >= 0:
+                continue
             self.remove_pit_entry(pit_entry.name)
         for pit_entry in updated:
+            if pit_entry.pub_sub >= 0:
+                continue
             self.remove_pit_entry(pit_entry.name)
             self.container.append(pit_entry)
         return updated, remove
