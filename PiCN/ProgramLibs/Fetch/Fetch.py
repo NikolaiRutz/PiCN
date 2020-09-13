@@ -18,7 +18,8 @@ class Fetch(object):
     """Fetch Tool for PiCN"""
 
     def __init__(self, ip: str, port: int, log_level=255, encoder: BasicEncoder = None, autoconfig: bool = False,
-                 interfaces=None):
+                 interfaces=None, face_id: int = -1):
+        self.face_id = face_id
 
         # create encoder and chunkifyer
         if encoder is None:
@@ -58,18 +59,20 @@ class Fetch(object):
         p = Process(target=self.fetch_data, args=(name,))
         p.start()
 
+    #TODO: make a schöner prnt
     def fetch_data(self, name: Name) -> str:
         """Fetch data from the server
         :param name Name to be fetched
         :param timeout Timeout to wait for a response. Use 0 for infinity
         """
-        #PIT muss befüllt werden; erst Interest schicken
+        # PIT muss befüllt werden; erst Interest schicken
         interest: Interest = Interest(name)
         self.lstack.queue_from_higher.put([self.fid, interest])
         while True:
             packet = self.lstack.queue_to_higher.get()[1]
             if isinstance(packet, Content):
-                print("name: " + str(packet.name) + " | returned content: " + str(packet.content))
+                print("Fetchtool_" + str(self.face_id) + " name: " + str(packet.name) + " | returned content: " + str(
+                    packet.content))
                 # return packet.content
             if isinstance(packet, Nack):
                 print("return Nack")
