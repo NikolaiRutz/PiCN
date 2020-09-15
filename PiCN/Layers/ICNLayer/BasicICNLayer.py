@@ -131,19 +131,21 @@ class BasicICNLayer(LayerProcess):
     def handle_content(self, face_id: int, content: Content, to_lower: multiprocessing.Queue,
                        to_higher: multiprocessing.Queue, from_local: bool = False):
         self.logger.info("Handling Content " + str(content.name) + " " + str(content.content))
-        pit_entry = self.pit.find_pit_entry(content.name)
-        if pit_entry is None:
+        #TODO: find_pit_entry list for schleife
+        pit_entry_list = self.pit.find_pit_entry_list(content.name)
+        if not pit_entry_list:
             self.logger.info("No PIT entry for content object available, dropping")
             #todo NACK??
             return
         else:
-            for i in range(0, len(pit_entry.faceids)):
-                if to_higher and pit_entry.local_app[i]:
-                    to_higher.put([face_id, content])
-                else:
-                    to_lower.put([pit_entry.faceids[i], content])
-            self.pit.remove_pit_entry(pit_entry.name)
-            self.cs.add_content_object(content)
+            for pit_entry in pit_entry_list:
+                for i in range(0, len(pit_entry.faceids)):
+                    if to_higher and pit_entry.local_app[i]:
+                        to_higher.put([face_id, content])
+                    else:
+                        to_lower.put([pit_entry.faceids[i], content])
+                self.pit.remove_pit_entry(pit_entry.name)
+                self.cs.add_content_object(content)
 
     def handle_nack(self, face_id: int, nack: Nack, to_lower: multiprocessing.Queue,
                     to_higher: multiprocessing.Queue, from_local: bool = False):

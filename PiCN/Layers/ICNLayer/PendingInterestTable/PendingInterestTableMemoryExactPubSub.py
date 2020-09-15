@@ -26,6 +26,9 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         return bool(re.search("subscribe\(\d*\)", sub_name))
 
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
+        sub_value = self.extract_sub_value(name)
+        if sub_value >= 0:
+            name = Name(name.components[:-1])
         for pit_entry in self.container:
             if pit_entry.name == name:
                 if faceid in pit_entry.face_id and local_app in pit_entry.local_app:
@@ -33,16 +36,15 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 self.container.remove(pit_entry)
                 pit_entry._faceids.append(faceid)
                 pit_entry._local_app.append(local_app)
-                if self.extract_sub_value(name) >= 0:
-                    pit_entry.pub_sub = self.extract_sub_value(name)
-                    name.components.pop()
+                if sub_value >= 0:
+                    pit_entry.pub_sub = sub_value
                 self.container.append(pit_entry)
+                print(str(pit_entry.name))
                 return
 
         pub_sub_value = -1
-        if self.extract_sub_value(name) >= 0:
-            pub_sub_value = self.extract_sub_value(name)
-            name.components.pop()
+        if sub_value >= 0:
+            pub_sub_value = sub_value
         self.container.append(
             PendingInterestTableEntry(name, faceid, interest, local_app, pub_sub=pub_sub_value))
 
@@ -59,6 +61,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
+    #TODO: matching list with pit_entries
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
@@ -79,6 +82,21 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                         return pit_entry
                     sub_entry_name.components.pop()
         return None
+
+    def find_pit_entry_list(self, name: Name):
+        pit_entry_list = []
+        for pit_entry in self.container:
+            if (pit_entry.name == name):
+                pit_entry_list.append(pit_entry)
+            if pit_entry.pub_sub >= 0:
+                sub_entry_name = Name(name.components[:])
+                if len(sub_entry_name) < len(pit_entry.name):
+                    continue
+                for i in range(min(pit_entry.pub_sub + 1, len(name.components))):
+                    if (sub_entry_name == pit_entry.name):
+                        pit_entry_list.append(pit_entry)
+                    sub_entry_name.components.pop()
+        return pit_entry_list
 
     def ageing(self) -> List[PendingInterestTableEntry]:
         cur_time = time.time()
