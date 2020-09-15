@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     # Test1: fetchtool0 content subscription
     name0 = Name("/data0/subscribe(10)")
-    fetch_tool_0.listen_for_content(name0)
+    # fetch_tool_0.listen_for_content(name0)
 
     name1 = Name("/data2/test2/subscribe(0)")
     #fetch_tool_0.listen_for_content(name1)
@@ -155,8 +155,8 @@ if __name__ == "__main__":
     name2 = Name("/data1/test1/content1/subscribe(3)")
     #fetch_tool_1.listen_for_content(name2)
 
-    name3 = Name("/data0/test0/subscribe(0)")
-    fetch_tool_1.listen_for_content(name3)
+    name3 = Name("/data0/test0/subscribe(2)")
+    #fetch_tool_1.listen_for_content(name3)
 
     name4 = Name("/data2/test2/content2/stuff2/subscribe(0)")
     #fetch_tool_1.listen_for_content(name4)
@@ -176,14 +176,22 @@ if __name__ == "__main__":
 
     # Test4: fetchtool4 content subscription
     name9 = Name("/data3/subscribe(10)")
-    #fetch_tool_3.listen_for_content(name9)
+    fetch_tool_3.listen_for_content(name9)
 
     name10 = Name("/data2/subscribe(10)")
     #fetch_tool_3.listen_for_content(name10)
 
     # TODO: wenn es keinen sleep gibt, wirft es eine exception
     time.sleep(3)
-    #TODO: gleichzeitiges fetchen nicht möglich
-    icn_repo0.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
+    #TODO: gleichzeitiges fetchen vom gleichen repo nicht möglich
+
+    # icn_repo0.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
+    # icn_repo1.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
+
     # icn_repo1.repolayer.add_content(Name("/data1/test1/content1/stuff0/djasndasd/sadasdas"), "testobj1")
-    # icn_repo2.repolayer.add_content(Name("/data3/test3/content3/stuff3/path3/asfasfasf/asfasfas"), "testobj3")
+
+    # icn_repo1.repolayer.add_content(Name("/data2/test2/content2/stuff2"), "testobj2")
+    # icn_repo1.repolayer.add_content(Name("/data2/verySpecificContent"), "specificContent")
+
+
+    icn_repo2.repolayer.add_content(Name("/data3/test3/content3/stuff3/path3/stuff3/shizzle3"), "testobj3")
