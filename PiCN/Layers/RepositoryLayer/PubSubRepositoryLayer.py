@@ -57,7 +57,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
             elif self._proagate_interest is True:
                 self.queue_to_lower.put([faceid, packet])
                 return
-            #TODO: subsciption list fix
+            #TODO: subsciption list fix (hinter Teil muss auch matchen; kann nur im Subnamen gleich sein)
             # wenn subscribe schon existiert dann wird interface geadded, sonst wird ein neuer Eintrag erstellt mit Face
             elif self.is_pub_sub(packet.name):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
@@ -76,7 +76,6 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                     self.queue_to_lower.put([0, content])
                 else:
                     self.logger.info("already subscribed. Face ID: " + str(faceid))
-
             else:
                 self.logger.info("No matching data, dropping interest, sending nack")
                 nack = Nack(packet.name, NackReason.NO_CONTENT, interest=packet)

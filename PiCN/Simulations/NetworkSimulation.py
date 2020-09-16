@@ -30,7 +30,7 @@ if __name__ == "__main__":
                             log_level=255, ageing_interval=1)
     # ICN Forwarder 3
     icn_fwd3 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn3")],
-                            log_level=0, ageing_interval=1)
+                            log_level=255, ageing_interval=1)
     # ICN Forwarder 4
     icn_fwd4 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn4")],
                             log_level=255, ageing_interval=1)
