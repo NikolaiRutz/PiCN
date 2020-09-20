@@ -23,12 +23,23 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         return
 
     def check_subscription(self, name: Name, data):
+        face_id = []
         for sub_element in self._repository._subscribtion_list:
-            for sub_index in range(sub_element[1] + 1):
-                if len(name) > sub_index and name.components[-1 - sub_index] == sub_element[0]:
-                    self.propagate_content(self._repository._subscribtion_list[sub_element], Content(name, data))
+            sub_entry_name = Name(name.components[:])
+            if len(name) < len(sub_element[0]):
+                print(str(sub_entry_name))
+                continue
+            for sub_index in range(min(sub_element[1] + 1, len(name))):
+                if sub_entry_name == sub_element[0]:
+                    for elem in self._repository._subscribtion_list[sub_element]:
+                        if elem not in face_id:
+                            face_id.append(elem)
+                sub_entry_name.components.pop()
+        self.propagate_content(face_id, Content(name, data))
 
+    #TODO: if print statement is removed, nothing works anymore blyat!!!!!
     def propagate_content(self, face_id: list, data):
+        print(face_id)
         for i in face_id:
             self.queue_to_lower.put([i, data])
             self.logger.info("Updating Subscriber about added content. FaceID: " + str(i))
@@ -57,12 +68,13 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
             elif self._proagate_interest is True:
                 self.queue_to_lower.put([faceid, packet])
                 return
-            #TODO: subsciption list fix (hinter Teil muss auch matchen; kann nur im Subnamen gleich sein)
+            # TODO: subsciption list fix (hinter Teil muss auch matchen; kann nur im Subnamen gleich sein)
             # wenn subscribe schon existiert dann wird interface geadded, sonst wird ein neuer Eintrag erstellt mit Face
             elif self.is_pub_sub(packet.name):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
-                path_name = packet.name.components[-2]
+                path_name = Name(packet.name.components[:-1])
+
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:
