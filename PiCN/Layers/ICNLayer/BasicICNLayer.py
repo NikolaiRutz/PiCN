@@ -17,9 +17,9 @@ class BasicICNLayer(LayerProcess):
     """ICN Forwarding Plane. Maintains data structures for ICN Forwarding
     """
 
-    def __init__(self, cs: BaseContentStore=None, pit: BasePendingInterestTable=None,
-            fib: BaseForwardingInformationBase=None, rib: BaseRoutingInformationBase = None, log_level=255,
-                 ageing_interval: int=3):
+    def __init__(self, cs: BaseContentStore = None, pit: BasePendingInterestTable = None,
+                 fib: BaseForwardingInformationBase = None, rib: BaseRoutingInformationBase = None, log_level=255,
+                 ageing_interval: int = 3):
         super().__init__(logger_name="ICNLayer", log_level=log_level)
         self.cs = cs
         self.pit = pit
@@ -34,9 +34,11 @@ class BasicICNLayer(LayerProcess):
         if isinstance(packet, Interest):
             self.handle_interest_from_higher(high_level_id, packet, to_lower, to_higher)
         elif isinstance(packet, Content):
-            self.handle_content(high_level_id, packet, to_lower, to_higher, True) #content handled same as for content from network
+            self.handle_content(high_level_id, packet, to_lower, to_higher,
+                                True)  # content handled same as for content from network
         elif isinstance(packet, Nack):
-            self.handle_nack(high_level_id, packet, to_lower, to_higher, True) #Nack handled same as for NACK from network
+            self.handle_nack(high_level_id, packet, to_lower, to_higher,
+                             True)  # Nack handled same as for NACK from network
 
     def data_from_lower(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data):
         if len(data) != 2:
@@ -58,8 +60,8 @@ class BasicICNLayer(LayerProcess):
         elif isinstance(packet, Nack):
             self.handle_nack(face_id, packet, to_lower, to_higher, False)
 
-    def handle_interest_from_higher (self, face_id: int, interest: Interest, to_lower: multiprocessing.Queue,
-                                   to_higher: multiprocessing.Queue):
+    def handle_interest_from_higher(self, face_id: int, interest: Interest, to_lower: multiprocessing.Queue,
+                                    to_higher: multiprocessing.Queue):
         self.logger.info("Handling Interest (from higher): " + str(interest.name) + "; Face ID: " + str(face_id))
         cs_entry = self.cs.find_content_object(interest.name)
         if cs_entry is not None:
@@ -107,14 +109,14 @@ class BasicICNLayer(LayerProcess):
             self.pit.update_timestamp(pit_entry)
             self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)
             return
-        if self._interest_to_app is True and to_higher is not None: #App layer support
+        if self._interest_to_app is True and to_higher is not None:  # App layer support
             self.logger.info("Sending to higher Layer")
             self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)
             self.queue_to_higher.put([face_id, interest])
             return
         new_face_id = self.fib.find_fib_entry(interest.name, None, [face_id])
         if new_face_id is not None:
-            self.logger.info("Found in FIB, forwarding to Face: " +  str(new_face_id.faceid))
+            self.logger.info("Found in FIB, forwarding to Face: " + str(new_face_id.faceid))
             self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)
             for fid in new_face_id.faceid:
                 if not self.pit.test_faceid_was_nacked(interest.name, fid):
@@ -131,19 +133,22 @@ class BasicICNLayer(LayerProcess):
     def handle_content(self, face_id: int, content: Content, to_lower: multiprocessing.Queue,
                        to_higher: multiprocessing.Queue, from_local: bool = False):
         self.logger.info("Handling Content " + str(content.name) + " " + str(content.content))
-        #TODO: find_pit_entry list for schleife
-        pit_entry_list = self.pit.find_pit_entry_list(content.name)
-        if not pit_entry_list:
+        pit_entry = self.pit.find_pit_entry(content.name)
+        face_ids = self.pit.find_face_ids(content.name)
+        print(face_ids)
+
+        if pit_entry is None:
             self.logger.info("No PIT entry for content object available, dropping")
-            #todo NACK??
+            # todo NACK??
             return
         else:
-            for pit_entry in pit_entry_list:
+            #TODO: wie genau muss das hier verändert werden?
+            for f in face_ids:
                 for i in range(0, len(pit_entry.faceids)):
                     if to_higher and pit_entry.local_app[i]:
-                        to_higher.put([face_id, content])
+                        to_higher.put([f, content])
                     else:
-                        to_lower.put([pit_entry.faceids[i], content])
+                        to_lower.put([f, content])
                 self.pit.remove_pit_entry(pit_entry.name)
                 self.cs.add_content_object(content)
 
@@ -158,15 +163,19 @@ class BasicICNLayer(LayerProcess):
         else:
             self.pit.add_nacked_faceid(nack.name, face_id)
             if cur_pit_entry.number_of_forwards > 1:
-                self.logger.info("Ignoring Nack from FaceID " + str(face_id) + " for " + str(nack.name) + " since other faces (" + str(cur_pit_entry.number_of_forwards) + ") are still active")
+                self.logger.info("Ignoring Nack from FaceID " + str(face_id) + " for " + str(
+                    nack.name) + " since other faces (" + str(cur_pit_entry.number_of_forwards) + ") are still active")
                 self.pit.decrease_number_of_forwards(nack.name)
                 return
             self.pit.set_number_of_forwards(nack.name, 0)
-            cur_fib_entry = self.fib.find_fib_entry(nack.name, cur_pit_entry.fib_entries_already_used, cur_pit_entry.faceids) #current entry
-            self.pit.add_used_fib_entry(nack.name, cur_fib_entry) #add current entry to used list, modiefies pit entry in pit
-            pit_entry = self.pit.find_pit_entry(nack.name) #read modified entry from pit
-            fib_entry = self.fib.find_fib_entry(nack.name, pit_entry.fib_entries_already_used, pit_entry.faceids) #read new fib entry
-            if fib_entry is None or fib_entry.faceid == [face_id]: #FIXME WHAT IS THE RIGHT CONDITION HERE?
+            cur_fib_entry = self.fib.find_fib_entry(nack.name, cur_pit_entry.fib_entries_already_used,
+                                                    cur_pit_entry.faceids)  # current entry
+            self.pit.add_used_fib_entry(nack.name,
+                                        cur_fib_entry)  # add current entry to used list, modiefies pit entry in pit
+            pit_entry = self.pit.find_pit_entry(nack.name)  # read modified entry from pit
+            fib_entry = self.fib.find_fib_entry(nack.name, pit_entry.fib_entries_already_used,
+                                                pit_entry.faceids)  # read new fib entry
+            if fib_entry is None or fib_entry.faceid == [face_id]:  # FIXME WHAT IS THE RIGHT CONDITION HERE?
                 if self._interest_to_app and not from_local and 'THUNK' in str(nack.name):
                     self.logger.info("Sending Thunk Nack to upper")
                     self.queue_to_higher.put([face_id, nack])
@@ -174,7 +183,7 @@ class BasicICNLayer(LayerProcess):
                 self.logger.info("Sending NACK to previous node(s)")
                 re_add = False
                 for i in range(0, len(pit_entry.faceids)):
-                    if pit_entry.local_app[i] == True: #Go with NACK first only to app layer if it was requested
+                    if pit_entry.local_app[i] == True:  # Go with NACK first only to app layer if it was requested
                         self.logger.info("Nack goes only to local first")
                         re_add = True
                 self.pit.remove_pit_entry(pit_entry.name)
@@ -202,10 +211,11 @@ class BasicICNLayer(LayerProcess):
         """Ageing the data structs"""
         try:
             self.logger.debug("Ageing")
-            #PIT ageing
+            # PIT ageing
             retransmits, removed_pit_entries = self.pit.ageing()
             for pit_entry in retransmits:
-                fib_entry = self.fib.find_fib_entry(pit_entry.name, pit_entry.fib_entries_already_used, pit_entry.faceids)
+                fib_entry = self.fib.find_fib_entry(pit_entry.name, pit_entry.fib_entries_already_used,
+                                                    pit_entry.faceids)
                 if not fib_entry:
                     continue
                 for fid in fib_entry.faceid:
@@ -216,8 +226,9 @@ class BasicICNLayer(LayerProcess):
                     continue
                 for fid, local in zip(pit_entry.faceids, pit_entry.local_app):
                     if local is True:
-                        self.queue_to_higher.put([fid, Nack(pit_entry.name, NackReason.PIT_TIMEOUT, pit_entry.interest)])
-            #CS ageing
+                        self.queue_to_higher.put(
+                            [fid, Nack(pit_entry.name, NackReason.PIT_TIMEOUT, pit_entry.interest)])
+            # CS ageing
             self.cs.ageing()
         except Exception as e:
             self.logger.warning("Exception during ageing: " + str(e))

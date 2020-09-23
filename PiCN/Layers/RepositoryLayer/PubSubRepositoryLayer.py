@@ -27,7 +27,6 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         for sub_element in self._repository._subscribtion_list:
             sub_entry_name = Name(name.components[:])
             if len(name) < len(sub_element[0]):
-                print(str(sub_entry_name))
                 continue
             for sub_index in range(min(sub_element[1] + 1, len(name))):
                 if sub_entry_name == sub_element[0]:
@@ -37,9 +36,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 sub_entry_name.components.pop()
         self.propagate_content(face_id, Content(name, data))
 
-    #TODO: if print statement is removed, nothing works anymore blyat!!!!!
     def propagate_content(self, face_id: list, data):
-        print(face_id)
         for i in face_id:
             self.queue_to_lower.put([i, data])
             self.logger.info("Updating Subscriber about added content. FaceID: " + str(i))

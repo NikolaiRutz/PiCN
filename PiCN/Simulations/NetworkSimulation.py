@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     # Test3: fetchtool2 content subscription
     name6 = Name("/data3/test3/subscribe(0)")
-    #fetch_tool_2.listen_for_content(name6)
+    fetch_tool_2.listen_for_content(name6)
 
     name7 = Name("/data3/test3/content3/stuff3/path3/subscribe(2)")
     #fetch_tool_2.listen_for_content(name7)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
     # Test4: fetchtool4 content subscription
     name9 = Name("/data3/subscribe(10)")
-    #fetch_tool_3.listen_for_content(name9)
+    fetch_tool_3.listen_for_content(name9)
 
     name10 = Name("/data2/subscribe(10)")
     #fetch_tool_3.listen_for_content(name10)
@@ -186,12 +186,12 @@ if __name__ == "__main__":
     #TODO: gleichzeitiges fetchen vom gleichen repo nicht möglich
 
     icn_repo0.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
-    # icn_repo1.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
+    #icn_repo1.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
 
-    # icn_repo1.repolayer.add_content(Name("/data1/test1/content1/stuff0/djasndasd/sadasdas"), "testobj1")
+    icn_repo1.repolayer.add_content(Name("/data1/test1/content1/stuff0/djasndasd/sadasdas"), "testobj1")
 
-    # icn_repo1.repolayer.add_content(Name("/data2/test2/content2/stuff2"), "testobj2")
-    # icn_repo1.repolayer.add_content(Name("/data2/verySpecificContent"), "specificContent")
+    icn_repo1.repolayer.add_content(Name("/data2/test2/content2/stuff2"), "testobj2")
+    icn_repo1.repolayer.add_content(Name("/data2/verySpecificContent"), "specificContent")
 
 
-    icn_repo2.repolayer.add_content(Name("/data3/test3/content3/stuff3/path3/stuff3/shizzle3"), "testobj3")
+    icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj3")
