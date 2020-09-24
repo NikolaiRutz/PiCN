@@ -25,6 +25,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         sub_name = name.components[-1].decode("utf-8")
         return bool(re.search("subscribe\(\d*\)", sub_name))
 
+    #TODO: Nonce hinzufügen
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         sub_value = self.extract_sub_value(name)
         if sub_value >= 0:
@@ -39,7 +40,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 if sub_value >= 0:
                     pit_entry.pub_sub = sub_value
                 self.container.append(pit_entry)
-                print(str(pit_entry.name))
                 return
 
         pub_sub_value = -1
