@@ -11,6 +11,7 @@ from PiCN.Layers.RoutingLayer.RoutingInformationBase import BaseRoutingInformati
 from PiCN.Layers.ICNLayer.PendingInterestTable import BasePendingInterestTable, PendingInterestTableEntry
 from PiCN.Packets import Name, Content, Interest, Packet, Nack, NackReason
 from PiCN.Processes import LayerProcess
+import re
 
 
 class BasicICNLayer(LayerProcess):
@@ -29,6 +30,13 @@ class BasicICNLayer(LayerProcess):
         self._ageing_interval: int = ageing_interval
         self._interest_to_app: bool = False
 
+    def extract_hop_value(self, name: Name) -> int:
+        return int(re.findall('\d+', name.components[-1].decode("utf-8"))[0])
+
+    def is_broadcast(self, name: Name) -> bool:
+        sub_name = name.components[-1].decode("utf-8")
+        return bool(re.search("findPit\(\d*\)", sub_name))
+
     def data_from_higher(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data):
         high_level_id = data[0]
         packet = data[1]
@@ -41,6 +49,7 @@ class BasicICNLayer(LayerProcess):
             self.handle_nack(high_level_id, packet, to_lower, to_higher,
                              True)  # Nack handled same as for NACK from network
 
+    #TODO: findpit-broadcast; überprüfen ob entry existiert; wenn ja dann broadcast zu allen faceIDS
     def data_from_lower(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data):
         if len(data) != 2:
             self.logger.warning("ICN Layer expects to receive [face id, packet] from lower layer")
@@ -104,6 +113,17 @@ class BasicICNLayer(LayerProcess):
             to_lower.put([face_id, cs_entry.content])
             self.cs.update_timestamp(cs_entry)
             return
+        if self.is_broadcast(interest.name):
+            search_name = Name(interest.name.components[:-1])
+            pit_entry = self.pit.find_pit_entry(search_name)
+            if pit_entry is not None:
+                print("somethings working")
+                #TODO: new Interest should be generated with sub_value and sent to all other faces?
+                return
+            else:
+                print("broadcast should happen here")
+                #TODO: new interest should be generated with find_value -1?
+                return
         pit_entry = self.pit.find_pit_entry(interest.name)
         if pit_entry is not None:
             self.logger.info("Found in PIT, appending")
@@ -136,8 +156,6 @@ class BasicICNLayer(LayerProcess):
         self.logger.info("Handling Content " + str(content.name) + " " + str(content.content))
         pit_entry = self.pit.find_pit_entry(content.name)
         face_ids = self.pit.find_face_ids(content.name)
-        print(face_ids)
-
         if pit_entry is None:
             self.logger.info("No PIT entry for content object available, dropping")
             # todo NACK??

@@ -11,6 +11,7 @@ from collections import defaultdict
 
 class PubSubRepositoryLayer(BasicRepositoryLayer):
 
+    #TODO: add Interest broadcast wenn sich repo bewegt
     def __init__(self, repository: BaseRepository = None, propagate_interest: bool = False, logger_name="RepoLayer",
                  log_level=255):
         BasicRepositoryLayer.__init__(self, repository=repository, propagate_interest=propagate_interest,
@@ -37,7 +38,9 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         self.propagate_content(face_id, Content(name, data))
 
     def propagate_content(self, face_id: list, data):
+        inter = Interest(Name("/data0/findPit(5)"))
         for i in face_id:
+            self.queue_to_lower.put([i, inter])
             self.queue_to_lower.put([i, data])
             self.logger.info("Updating Subscriber about added content. FaceID: " + str(i))
 
