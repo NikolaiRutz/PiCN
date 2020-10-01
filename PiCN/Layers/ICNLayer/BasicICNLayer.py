@@ -18,7 +18,7 @@ class BasicICNLayer(LayerProcess):
     """ICN Forwarding Plane. Maintains data structures for ICN Forwarding
     """
 
-    #TODO: findPit soll versatnden werden
+    # TODO: findPit soll versatnden werden
     def __init__(self, cs: BaseContentStore = None, pit: BasePendingInterestTable = None,
                  fib: BaseForwardingInformationBase = None, rib: BaseRoutingInformationBase = None, log_level=255,
                  ageing_interval: int = 3):
@@ -49,7 +49,7 @@ class BasicICNLayer(LayerProcess):
             self.handle_nack(high_level_id, packet, to_lower, to_higher,
                              True)  # Nack handled same as for NACK from network
 
-    #TODO: findpit-broadcast; überprüfen ob entry existiert; wenn ja dann broadcast zu allen faceIDS
+    # TODO: findpit-broadcast; überprüfen ob entry existiert; wenn ja dann broadcast zu allen faceIDS
     def data_from_lower(self, to_lower: multiprocessing.Queue, to_higher: multiprocessing.Queue, data):
         if len(data) != 2:
             self.logger.warning("ICN Layer expects to receive [face id, packet] from lower layer")
@@ -113,16 +113,22 @@ class BasicICNLayer(LayerProcess):
             to_lower.put([face_id, cs_entry.content])
             self.cs.update_timestamp(cs_entry)
             return
+        #TODO: pubsub interest check ob es passenden fidPit entry gibt; faceID um interste weiterschicken
         if self.is_broadcast(interest.name):
             search_name = Name(interest.name.components[:-1])
             pit_entry = self.pit.find_pit_entry(search_name)
             if pit_entry is not None:
-                print("somethings working")
-                #TODO: new Interest should be generated with sub_value and sent to all other faces?
+                print("something's working")
+                #self.queue_to_lower.put faceid etc
+                # TODO: new Interest should be generated with sub_value and sent to all other faces?
                 return
             else:
-                print("broadcast should happen here")
-                #TODO: new interest should be generated with find_value -1?
+                #alle faceIDs schicken zum testen ;)
+                if self.extract_hop_value(interest.name) > 0:
+                    print("broadcast should happen here")
+                    # TODO: new interest should be generated with find_value -1?
+                    components = search_name.components_to_string()
+                    search_name = Name(components + "/findPit(" + str(self.extract_hop_value(interest.name) - 1) + ")")
                 return
         pit_entry = self.pit.find_pit_entry(interest.name)
         if pit_entry is not None:
@@ -161,7 +167,7 @@ class BasicICNLayer(LayerProcess):
             # todo NACK??
             return
         else:
-            #TODO: wie genau muss das hier verändert werden?
+            # TODO: wie genau muss das hier verändert werden?
             for f in face_ids:
                 for i in range(0, len(pit_entry.faceids)):
                     if to_higher and pit_entry.local_app[i]:
