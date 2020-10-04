@@ -24,7 +24,7 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         sub_name = name.components[-1].decode("utf-8")
         return bool(re.search("subscribe\(\d*\)", sub_name))
 
-    #TODO: Nonce hinzufügen
+    #TODO: gleicher subscribe interest soll beim adden überprüft werden, ob findPIT dazu existiert; falls ja soll die FaceID ersetzt werden?
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         sub_value = self.extract_sub_value(name)
         if sub_value >= 0:
@@ -60,18 +60,16 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
-    # TODO: matching list with pit_entries
+    # TODO: wenn findtPIT wird ein findPit value erstellt. Durchsuche PIT mit subscribe nach vorhandenen gleichen findPIT einträgen
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
             if (self.is_pub_sub(name)):
+                #TODO: wenn pubSub muss überprüft werden, ob findPIT dazu existiert (data/findPit(5)-> FaceID zurückgeben, wenn data/sub(10) kommt zb
                 sub_entry_name = Name(pit_entry.name.components[:-1])
-                # TODO: schauen ob auch der sub value gleich sein muss
                 if (sub_entry_name == pit_entry.name):
                     return pit_entry
-            # 2 cases. einmal interest mit sub hinten dran -> soll auch pitentry returnen
-            # und einmal content der zum client zurückfinden soll
             if pit_entry.pub_sub >= 0:
                 sub_entry_name = Name(name.components[:])
                 if len(sub_entry_name) < len(pit_entry.name):
@@ -82,7 +80,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                     sub_entry_name.components.pop()
         return None
 
-    # TODO: just return face_ids nothing else
     def find_face_ids(self, name: Name) -> list:
         face_ids = []
         for pit_entry in self.container:
