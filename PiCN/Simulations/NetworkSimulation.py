@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     # Test1: fetchtool0 content subscription
     name0 = Name("/data0/subscribe(10)")
-    fetch_tool_0.listen_for_content(name0)
+    #fetch_tool_0.listen_for_content(name0)
 
     name1 = Name("/data2/test2/subscribe(0)")
     #fetch_tool_0.listen_for_content(name1)
@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     # Test3: fetchtool2 content subscription
     name6 = Name("/data3/test3/subscribe(0)")
-    fetch_tool_2.listen_for_content(name6)
+    #fetch_tool_2.listen_for_content(name6)
 
     name7 = Name("/data3/test3/content3/stuff3/path3/subscribe(2)")
     #fetch_tool_2.listen_for_content(name7)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
     # Test4: fetchtool4 content subscription
     name9 = Name("/data3/subscribe(10)")
-    fetch_tool_3.listen_for_content(name9)
+    #fetch_tool_3.listen_for_content(name9)
 
     name10 = Name("/data2/subscribe(10)")
     #fetch_tool_3.listen_for_content(name10)

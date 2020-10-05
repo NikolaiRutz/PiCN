@@ -38,7 +38,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         self.propagate_content(face_id, Content(name, data))
 
     def propagate_content(self, face_id: list, data):
-        inter = Interest(Name("/data0/findPit(5)"))
+        inter = Interest(Name("/data0/test0/findPit(5)"))
         for i in face_id:
             self.queue_to_lower.put([i, inter])
             self.queue_to_lower.put([i, data])

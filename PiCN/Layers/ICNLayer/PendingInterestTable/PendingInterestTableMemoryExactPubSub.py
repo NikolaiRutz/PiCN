@@ -14,9 +14,10 @@ import re
 
 class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
 
-    def __init__(self, pit_timeout: int = 10, pit_retransmits: int = 3, pub_sub: int = -1):
+    def __init__(self, pit_timeout: int = 10, pit_retransmits: int = 3, pub_sub: int = -1, is_broadcast: bool = False):
         BasePendingInterestTable.__init__(self, pit_timeout=pit_timeout, pit_retransmits=pit_retransmits)
         self.pub_sub = pub_sub
+        self.is_broadcast = is_broadcast
 
     # TODO: clean this code
     # regex expression noch nicht ganz richtig (auch true wenn kein Wert in den Klammern steht)
@@ -27,7 +28,9 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
     #TODO: Nonce hinzufügen
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         sub_value = self.extract_sub_value(name)
-        if sub_value >= 0:
+        is_pub_sub = self.is_pub_sub(name)
+        is_broadcast = False
+        if sub_value >= 0 and is_pub_sub:
             name = Name(name.components[:-1])
         for pit_entry in self.container:
             if pit_entry.name == name:
@@ -38,14 +41,19 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
                 pit_entry._local_app.append(local_app)
                 if sub_value >= 0:
                     pit_entry.pub_sub = sub_value
+                if not is_pub_sub:
+                    pit_entry.is_broadcast = True
                 self.container.append(pit_entry)
                 return
-
         pub_sub_value = -1
         if sub_value >= 0:
-            pub_sub_value = sub_value
+            if is_pub_sub:
+                pub_sub_value = sub_value
+            else:
+                is_broadcast = True
+        #findPIT entry wird nicht appended
         self.container.append(
-            PendingInterestTableEntry(name, faceid, interest, local_app, pub_sub=pub_sub_value))
+            PendingInterestTableEntry(name, faceid, interest, local_app, pub_sub=pub_sub_value, is_broadcast = is_broadcast))
 
     def extract_sub_value(self, name: Name) -> int:
         return int(re.findall('\d+', name.components[-1].decode("utf-8"))[0])
@@ -60,14 +68,14 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         for r in to_remove:
             self.container.remove(r)
 
-    # TODO: matching list with pit_entries
+
     def find_pit_entry(self, name: Name) -> PendingInterestTableEntry:
         for pit_entry in self.container:
             if (pit_entry.name == name):
                 return pit_entry
+            # TODO: hier muss zuerst der findPit entry zurückgegeben werden, falls ein sub_request kommt
             if (self.is_pub_sub(name)):
                 sub_entry_name = Name(pit_entry.name.components[:-1])
-                # TODO: schauen ob auch der sub value gleich sein muss
                 if (sub_entry_name == pit_entry.name):
                     return pit_entry
             # 2 cases. einmal interest mit sub hinten dran -> soll auch pitentry returnen

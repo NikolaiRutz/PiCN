@@ -116,17 +116,20 @@ class BasicICNLayer(LayerProcess):
         #TODO: pubsub interest check ob es passenden fidPit entry gibt; faceID um interste weiterschicken
         if self.is_broadcast(interest.name):
             search_name = Name(interest.name.components[:-1])
+            #findPit muss angepasst werden damit der richtige eintrag returned wird
             pit_entry = self.pit.find_pit_entry(search_name)
             if pit_entry is not None:
-                print("something's working")
-                #self.queue_to_lower.put faceid etc
-                # TODO: new Interest should be generated with sub_value and sent to all other faces?
+                components = search_name.components_to_string()
+                search_name = Name(components + "/subscribe(" + str(pit_entry.pub_sub) + ")")
+                #scheint nichts zu passieren
+                self.queue_to_lower.put([face_id, Interest(search_name)])
+                print("here")
                 return
             else:
                 #alle faceIDs schicken zum testen ;)
                 if self.extract_hop_value(interest.name) > 0:
-                    print("broadcast should happen here")
-                    # TODO: new interest should be generated with find_value -1?
+                    self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)
+                    print("to all faceIDS")
                     components = search_name.components_to_string()
                     search_name = Name(components + "/findPit(" + str(self.extract_hop_value(interest.name) - 1) + ")")
                 return
@@ -167,7 +170,6 @@ class BasicICNLayer(LayerProcess):
             # todo NACK??
             return
         else:
-            # TODO: wie genau muss das hier verändert werden?
             for f in face_ids:
                 for i in range(0, len(pit_entry.faceids)):
                     if to_higher and pit_entry.local_app[i]:

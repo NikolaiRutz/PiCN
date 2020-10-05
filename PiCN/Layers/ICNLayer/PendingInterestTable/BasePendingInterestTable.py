@@ -16,9 +16,10 @@ class PendingInterestTableEntry(object):
     # pub sub hinzufügen BOOL
     def __init__(self, name: Name, faceid: int, interest: Interest = None, local_app: bool = False,
                  fib_entries_already_used: List[ForwardingInformationBaseEntry] = None, faces_already_nacked=None,
-                 number_of_forwards=0, pub_sub: int = -1):
+                 number_of_forwards=0, pub_sub: int = -1, is_broadcast: bool = False):
         self.name = name
         self.pub_sub = pub_sub
+        self.is_broadcast = is_broadcast
         self._faceids: List[int] = []
         if isinstance(faceid, list):
             self._faceids.extend(faceid)
