@@ -115,23 +115,25 @@ class BasicICNLayer(LayerProcess):
             return
         #TODO: pubsub interest check ob es passenden fidPit entry gibt; faceID um interste weiterschicken
         if self.is_broadcast(interest.name):
-            search_name = Name(interest.name.components[:-1])
-            #findPit muss angepasst werden damit der richtige eintrag returned wird
-            pit_entry = self.pit.find_pit_entry(search_name)
+            search_interest = Name(interest.name.components[:-1])
+            pit_entry = self.pit.find_pit_entry(interest.name)
             if pit_entry is not None:
-                components = search_name.components_to_string()
-                search_name = Name(components + "/subscribe(" + str(pit_entry.pub_sub) + ")")
+                # findPit muss angepasst werden damit der richtige eintrag returned wird
+                components = search_interest.components_to_string()
+                search_interest = Interest(Name(components + "/subscribe(" + str(pit_entry.pub_sub) + ")"))
                 #scheint nichts zu passieren
-                self.queue_to_lower.put([face_id, Interest(search_name)])
-                print("here")
+                self.queue_to_lower.put([face_id, search_interest])
+                #/data0/subscribe(5)
                 return
             else:
-                #alle faceIDs schicken zum testen ;)
+                self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)
                 if self.extract_hop_value(interest.name) > 0:
-                    self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)
                     print("to all faceIDS")
-                    components = search_name.components_to_string()
-                    search_name = Name(components + "/findPit(" + str(self.extract_hop_value(interest.name) - 1) + ")")
+                    components = search_interest.components_to_string()
+                    search_interest = Interest(Name(components + "/findPit(" + str(self.extract_hop_value(interest.name) - 1) + ")"))
+                    #TODO: insert broadcast here
+                    for i in range(0, 100):
+                        self.queue_to_lower.put([i, search_interest])
                 return
         pit_entry = self.pit.find_pit_entry(interest.name)
         if pit_entry is not None:

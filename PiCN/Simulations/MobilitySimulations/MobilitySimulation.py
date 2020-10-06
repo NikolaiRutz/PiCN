@@ -211,6 +211,7 @@ class MobilitySimulation(object):
 
         connected_rsu = self.connected_rsu[mobile_node_number]
 
+        #TODO: copy code here
         self._mobile_nodes[mobile_node_number].forwarder.icnlayer.fib.remove_fib_entry(self._stationary_node_name_prefix)
         self._mobile_nodes[mobile_node_number].forwarder.icnlayer.fib.add_fib_entry(self._stationary_node_name_prefix,
                                                                    [self.to_rsu_faces[new_rsu_number][mobile_node_number]])

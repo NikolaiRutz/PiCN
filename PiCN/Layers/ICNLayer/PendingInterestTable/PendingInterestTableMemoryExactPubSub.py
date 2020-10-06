@@ -12,6 +12,7 @@ import re
 """PIT for Pub/Sub Model"""
 
 
+# TODO: Nonce hinzufügen
 class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
 
     def __init__(self, pit_timeout: int = 10, pit_retransmits: int = 3, pub_sub: int = -1, is_broadcast: bool = False):
@@ -25,7 +26,6 @@ class PendingInterestTableMemoryExactPubSub(PendingInterstTableMemoryExact):
         sub_name = name.components[-1].decode("utf-8")
         return bool(re.search("subscribe\(\d*\)", sub_name))
 
-    #TODO: Nonce hinzufügen
     def add_pit_entry(self, name, faceid: int, interest: Interest = None, local_app=False):
         sub_value = self.extract_sub_value(name)
         is_pub_sub = self.is_pub_sub(name)

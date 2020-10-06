@@ -105,6 +105,7 @@ if __name__ == "__main__":
     simulation_bus.start_process()
 
     # interfaces the content is forwarded to
+    #TODO: add face gibt string mit faceID zurück; face7to9 = fwd7.linklayer.faceidtable.get_or_create_faceid(AddressInfo("fwd9", 0))
     mgmt_client0.add_face("icn2", None, 0)
     mgmt_client0.add_face("icn4", None, 0)
     mgmt_client1.add_face("icn6", None, 0)
@@ -118,6 +119,7 @@ if __name__ == "__main__":
     mgmt_client6.add_face("icn8", None, 0)
     mgmt_client7.add_face("repo2", None, 0)
     mgmt_client8.add_face("repo2", None, 0)
+    #faces zu repo2 von icn9 und von icn7 zu icn9 erstellen
 
     # FW-Rules
     mgmt_client0.add_forwarding_rule(Name("/data0"), [0, 1])
