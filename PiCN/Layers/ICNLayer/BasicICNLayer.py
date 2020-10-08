@@ -117,13 +117,14 @@ class BasicICNLayer(LayerProcess):
         if self.is_broadcast(interest.name):
             search_interest = Name(interest.name.components[:-1])
             pit_entry = self.pit.find_pit_entry(interest.name)
+            print(str(interest.name))
             if pit_entry is not None:
-                # findPit muss angepasst werden damit der richtige eintrag returned wird
                 components = search_interest.components_to_string()
-                search_interest = Interest(Name(components + "/subscribe(" + str(pit_entry.pub_sub) + ")"))
-                #scheint nichts zu passieren
-                self.queue_to_lower.put([face_id, search_interest])
-                #/data0/subscribe(5)
+                if pit_entry.pub_sub >= 0:
+                    search_interest = Interest(Name(components + "/subscribe(" + str(pit_entry.pub_sub) + ")"))
+                    #scheint nichts zu passieren
+                    self.queue_to_lower.put([face_id, search_interest])
+
                 return
             else:
                 self.pit.add_pit_entry(interest.name, face_id, interest, local_app=from_local)

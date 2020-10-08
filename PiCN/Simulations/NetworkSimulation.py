@@ -47,6 +47,10 @@ if __name__ == "__main__":
     icn_fwd8 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn8")],
                             log_level=255, ageing_interval=1)
 
+    # ICN Forwarder 9
+    icn_fwd9 = ICNForwarder(port=0, encoder=NdnTlvEncoder(), interfaces=[simulation_bus.add_interface("icn9")],
+                            log_level=255, ageing_interval=1)
+
     # PS PIT
     icn_fwd0.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
     icn_fwd1.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
@@ -57,6 +61,7 @@ if __name__ == "__main__":
     icn_fwd6.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
     icn_fwd7.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
     icn_fwd8.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
+    icn_fwd9.icnlayer.pit = synced_data_struct_factory.manager.pit(pub_sub=True)
 
     # PS Repos
     icn_repo0 = ICNDataRepositoryPubSub(foldername=None, prefix=Name("/data0"), port=0,
@@ -88,6 +93,7 @@ if __name__ == "__main__":
     mgmt_client6 = MgmtClient(icn_fwd6.mgmt.mgmt_sock.getsockname()[1])
     mgmt_client7 = MgmtClient(icn_fwd7.mgmt.mgmt_sock.getsockname()[1])
     mgmt_client8 = MgmtClient(icn_fwd8.mgmt.mgmt_sock.getsockname()[1])
+    mgmt_client9 = MgmtClient(icn_fwd9.mgmt.mgmt_sock.getsockname()[1])
 
     # start everything
     icn_fwd0.start_forwarder()
@@ -99,16 +105,17 @@ if __name__ == "__main__":
     icn_fwd6.start_forwarder()
     icn_fwd7.start_forwarder()
     icn_fwd8.start_forwarder()
+    icn_fwd9.start_forwarder()
     icn_repo0.start_repo()
     icn_repo1.start_repo()
     icn_repo2.start_repo()
     simulation_bus.start_process()
 
     # interfaces the content is forwarded to
-    #TODO: add face gibt string mit faceID zurück; face7to9 = fwd7.linklayer.faceidtable.get_or_create_faceid(AddressInfo("fwd9", 0))
+    # TODO: add face gibt string mit faceID zurück; face7to9 = fwd7.linklayer.faceidtable.get_or_create_faceid(AddressInfo("fwd9", 0))
     mgmt_client0.add_face("icn2", None, 0)
     mgmt_client0.add_face("icn4", None, 0)
-    mgmt_client1.add_face("icn6", None, 0)
+    #mgmt_client1.add_face("icn6", None, 0)
     mgmt_client1.add_face("icn7", None, 0)
     mgmt_client2.add_face("icn3", None, 0)
     mgmt_client3.add_face("repo0", None, 0)
@@ -118,8 +125,12 @@ if __name__ == "__main__":
     mgmt_client6.add_face("icn4", None, 0)
     mgmt_client6.add_face("icn8", None, 0)
     mgmt_client7.add_face("repo2", None, 0)
+    mgmt_client7.add_face("icn9", None, 0)
     mgmt_client8.add_face("repo2", None, 0)
-    #faces zu repo2 von icn9 und von icn7 zu icn9 erstellen
+    mgmt_client9.add_face("repo2", None, 0)
+
+    face7to9 = icn_fwd7.linklayer.faceidtable.get_or_create_faceid(AddressInfo("icn9", 0))
+    face9toRep2 = icn_fwd9.linklayer.faceidtable.get_or_create_faceid(AddressInfo("repo2", 0))
 
     # FW-Rules
     mgmt_client0.add_forwarding_rule(Name("/data0"), [0, 1])
@@ -146,54 +157,61 @@ if __name__ == "__main__":
     mgmt_client7.add_forwarding_rule(Name("/data3"), [0])
     mgmt_client8.add_forwarding_rule(Name("/data3"), [0])
 
+    # TODO: methoden-parameter unklar zum FW-Rules entfernen
+
     # Test1: fetchtool0 content subscription
     name0 = Name("/data0/subscribe(10)")
-    #fetch_tool_0.listen_for_content(name0)
+    # fetch_tool_0.listen_for_content(name0)
 
     name1 = Name("/data2/test2/subscribe(0)")
-    #fetch_tool_0.listen_for_content(name1)
+    # fetch_tool_0.listen_for_content(name1)
 
     # Test2: fetchtool1 content subscription
     name2 = Name("/data1/test1/content1/subscribe(3)")
-    #fetch_tool_1.listen_for_content(name2)
+    # fetch_tool_1.listen_for_content(name2)
 
     name3 = Name("/data0/test0/subscribe(2)")
-    fetch_tool_1.listen_for_content(name3)
+    #fetch_tool_1.listen_for_content(name3)
 
     name4 = Name("/data2/test2/content2/stuff2/subscribe(0)")
-    #fetch_tool_1.listen_for_content(name4)
+    # fetch_tool_1.listen_for_content(name4)
 
     name5 = Name("/data3/test3/otherContent3/subscribe(3)")
-    #fetch_tool_1.listen_for_content(name5)
+    # fetch_tool_1.listen_for_content(name5)
 
     # Test3: fetchtool2 content subscription
     name6 = Name("/data3/test3/subscribe(0)")
-    #fetch_tool_2.listen_for_content(name6)
+    # fetch_tool_2.listen_for_content(name6)
 
     name7 = Name("/data3/test3/content3/stuff3/path3/subscribe(2)")
-    #fetch_tool_2.listen_for_content(name7)
+    # fetch_tool_2.listen_for_content(name7)
 
     name8 = Name("/data2/verySpecificContent/subscribe(0)")
-    #fetch_tool_2.listen_for_content(name8)
+    # fetch_tool_2.listen_for_content(name8)
 
     # Test4: fetchtool4 content subscription
     name9 = Name("/data3/subscribe(10)")
-    #fetch_tool_3.listen_for_content(name9)
+    fetch_tool_3.listen_for_content(name9)
 
     name10 = Name("/data2/subscribe(10)")
-    #fetch_tool_3.listen_for_content(name10)
+    # fetch_tool_3.listen_for_content(name10)
 
     # TODO: wenn es keinen sleep gibt, wirft es eine exception
     time.sleep(3)
-    #TODO: gleichzeitiges fetchen vom gleichen repo nicht möglich
+    # TODO: gleichzeitiges fetchen vom gleichen repo nicht möglich
 
     icn_repo0.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
-    #icn_repo1.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
+    # icn_repo1.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
 
     icn_repo1.repolayer.add_content(Name("/data1/test1/content1/stuff0/djasndasd/sadasdas"), "testobj1")
 
     icn_repo1.repolayer.add_content(Name("/data2/test2/content2/stuff2"), "testobj2")
     icn_repo1.repolayer.add_content(Name("/data2/verySpecificContent"), "specificContent")
 
+    #icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj3")
 
-    icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj3")
+    time.sleep(3)
+    icn_fwd7.icnlayer.fib.remove_fib_entry(Name("/data3"))
+    icn_fwd7.icnlayer.fib.add_fib_entry(Name("/data3"), [face7to9])
+    icn_fwd9.icnlayer.fib.add_fib_entry(Name("/data3"), [face9toRep2])
+    icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj4")
