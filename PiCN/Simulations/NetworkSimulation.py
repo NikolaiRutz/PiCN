@@ -131,8 +131,13 @@ if __name__ == "__main__":
 
     face7to9 = icn_fwd7.linklayer.faceidtable.get_or_create_faceid(AddressInfo("icn9", 0))
     face9toRep2 = icn_fwd9.linklayer.faceidtable.get_or_create_faceid(AddressInfo("repo2", 0))
+    icn_fwd9.linklayer.faceidtable.get_or_create_faceid(AddressInfo("icn7", 0))
+    icn_repo2.linklayer.faceidtable.get_or_create_faceid(AddressInfo("icn9", 0))
 
-    # FW-Rules
+    icn_fwd9.icnlayer.fib.add_fib_entry(Name("/data3"), [face9toRep2])
+
+
+    #TODO: FW-Rules wurden angepasst. aufpassen beim wiederherstellen
     mgmt_client0.add_forwarding_rule(Name("/data0"), [0, 1])
     mgmt_client2.add_forwarding_rule(Name("/data0"), [0])
     mgmt_client3.add_forwarding_rule(Name("/data0"), [0])
@@ -196,9 +201,7 @@ if __name__ == "__main__":
     name10 = Name("/data2/subscribe(10)")
     # fetch_tool_3.listen_for_content(name10)
 
-    # TODO: wenn es keinen sleep gibt, wirft es eine exception
     time.sleep(3)
-    # TODO: gleichzeitiges fetchen vom gleichen repo nicht möglich
 
     icn_repo0.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
     # icn_repo1.repolayer.add_content(Name("/data0/test0/content0/stuff0"), "testobj0")
@@ -208,10 +211,9 @@ if __name__ == "__main__":
     icn_repo1.repolayer.add_content(Name("/data2/test2/content2/stuff2"), "testobj2")
     icn_repo1.repolayer.add_content(Name("/data2/verySpecificContent"), "specificContent")
 
-    #icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj3")
-
+    icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj3")
     time.sleep(3)
     icn_fwd7.icnlayer.fib.remove_fib_entry(Name("/data3"))
     icn_fwd7.icnlayer.fib.add_fib_entry(Name("/data3"), [face7to9])
-    icn_fwd9.icnlayer.fib.add_fib_entry(Name("/data3"), [face9toRep2])
-    icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj4")
+    icn_repo2.repolayer.reestablish_subscription()
+    time.sleep(5)

@@ -7,11 +7,11 @@ from PiCN.Processes import LayerProcess
 from PiCN.Packets import Content, Interest, Name
 import re
 from collections import defaultdict
+import copy
 
 
 class PubSubRepositoryLayer(BasicRepositoryLayer):
 
-    #TODO: add Interest broadcast wenn sich repo bewegt
     def __init__(self, repository: BaseRepository = None, propagate_interest: bool = False, logger_name="RepoLayer",
                  log_level=255):
         BasicRepositoryLayer.__init__(self, repository=repository, propagate_interest=propagate_interest,
@@ -22,6 +22,20 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         self._repository.add_content(name, data)
         self.check_subscription(name, data)
         return
+
+    # TODO: clear old faciIDs and send findPit-interest broadcast to reestablish subscriptions
+    def reestablish_subscription(self, max_hop: int = 3):
+        clone_subscription = copy.deepcopy(self._repository._subscribtion_list)
+        for sub_element in clone_subscription:
+            broadcast_interest = Interest(sub_element[0].components_to_string() + "/findPit(" + str(max_hop) + ")")
+            self._repository._subscribtion_list.pop(sub_element)
+            #TODO: broadcast to all
+            self.queue_to_lower.put([0, broadcast_interest])
+            for i in range(5):
+
+                #self.queue_to_lower.put([i, broadcast_interest])
+                self.logger.info("trying to rebuild subscription for " + str(sub_element[0]))
+
 
     def check_subscription(self, name: Name, data):
         face_id = []
@@ -38,9 +52,7 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
         self.propagate_content(face_id, Content(name, data))
 
     def propagate_content(self, face_id: list, data):
-        inter = Interest(Name("/data3/findPit(5)"))
         for i in face_id:
-            self.queue_to_lower.put([i, inter])
             self.queue_to_lower.put([i, data])
             self.logger.info("Updating Subscriber about added content. FaceID: " + str(i))
 
@@ -74,7 +86,6 @@ class PubSubRepositoryLayer(BasicRepositoryLayer):
                 # list index kann out of range sein. Kann gehandelt werden aber vorest aufpassen
                 sub_length = self.extract_sub_value(packet.name)
                 path_name = Name(packet.name.components[:-1])
-
                 if (path_name, sub_length) not in self._repository._subscribtion_list:
                     self._repository._subscribtion_list[(path_name, sub_length)] = [faceid]
                 elif faceid not in self._repository._subscribtion_list[(path_name, sub_length)]:
