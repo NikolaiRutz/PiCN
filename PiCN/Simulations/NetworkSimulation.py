@@ -166,10 +166,10 @@ if __name__ == "__main__":
 
     # Test1: fetchtool0 content subscription
     name0 = Name("/data0/subscribe(10)")
-    # fetch_tool_0.listen_for_content(name0)
+    fetch_tool_0.listen_for_content(name0)
 
     name1 = Name("/data2/test2/subscribe(0)")
-    # fetch_tool_0.listen_for_content(name1)
+    fetch_tool_0.listen_for_content(name1)
 
     # Test2: fetchtool1 content subscription
     name2 = Name("/data1/test1/content1/subscribe(3)")
@@ -217,3 +217,4 @@ if __name__ == "__main__":
     icn_fwd7.icnlayer.fib.add_fib_entry(Name("/data3"), [face7to9])
     icn_repo2.repolayer.reestablish_subscription()
     time.sleep(5)
+    icn_repo2.repolayer.add_content(Name("/data3/test3"), "testobj3")
